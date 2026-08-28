@@ -65,7 +65,6 @@ export function buildDefaultSettings(): AuctionSettings {
     ),
     landImagePath: "/images/land-aerial.jpg",
     siteName: "Brand My Land",
-    heroEyebrow: "São Vicente, Madeira · 1,300 m²",
     heroHeadline: "Your brand. On my land.",
     heroBody:
       "Bid on a real banner or flag on my field. If you win, your brand stays on the land for a year — and on this website after that.",

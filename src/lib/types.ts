@@ -118,7 +118,6 @@ export type AuctionSettings = {
   antiSnipeExtensionSeconds: number;
   landImagePath: string;
   siteName: string;
-  heroEyebrow: string;
   heroHeadline: string;
   heroBody: string;
   storyHeading: string;

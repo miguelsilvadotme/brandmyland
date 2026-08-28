@@ -40,8 +40,7 @@ export function HeroBanner({
 
   return (
     <section className="mx-auto max-w-3xl px-4 pb-8 pt-12 text-center md:pt-16">
-      <p className="text-sm text-muted-foreground">São Vicente, Madeira · 1,300 m²</p>
-      <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-6xl">
+      <h1 className="text-4xl font-semibold tracking-tight md:text-6xl">
         Your brand. On my land.
       </h1>
       <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
