@@ -33,13 +33,15 @@ function pad(n: number, width = 2) {
   return String(n).padStart(width, "0");
 }
 
-/** White-outlined plot on /images/land-aerial.jpg, in 0–100 map space. */
-const PLOT = {
-  tl: { x: 16.5, y: 15.0 },
-  tr: { x: 73.5, y: 13.5 },
-  br: { x: 78.0, y: 63.5 },
-  bl: { x: 18.5, y: 73.0 },
+/** Axis-aligned plot in 0–100 map space — a clean rectangle of cards. */
+export const PLOT = {
+  tl: { x: 16, y: 14 },
+  tr: { x: 84, y: 14 },
+  br: { x: 84, y: 86 },
+  bl: { x: 16, y: 86 },
 };
+
+export const PLOT_OUTLINE = [PLOT.tl, PLOT.tr, PLOT.br, PLOT.bl];
 
 function plotPoint(u: number, v: number): Point {
   const { tl, tr, br, bl } = PLOT;
@@ -48,12 +50,6 @@ function plotPoint(u: number, v: number): Point {
   const y =
     (1 - v) * ((1 - u) * tl.y + u * tr.y) + v * ((1 - u) * bl.y + u * br.y);
   return pt(x, y);
-}
-
-function plotTangentDeg(u: number, v: number): number {
-  const a = plotPoint(Math.max(0, u - 0.02), v);
-  const b = plotPoint(Math.min(1, u + 0.02), v);
-  return (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
 }
 
 function dist(a: Point, b: Point) {
@@ -115,13 +111,7 @@ function bannerAt(
     locationNote: args.notes,
     geometry: {
       kind: "rect",
-      points: rotatedRect(
-        center.x,
-        center.y,
-        w,
-        h,
-        plotTangentDeg(cell.u, cell.v),
-      ),
+      points: rotatedRect(center.x, center.y, w, h, 0),
     },
   };
 }
@@ -208,7 +198,7 @@ export function buildPlacementDefinitions(): PlacementDefinition[] {
       id: `B-S-${pad(i + 1)}`,
       tier: "small",
       name: `Small field banner ${pad(i + 1)}`,
-      notes: `Small banner ${pad(i + 1)} filling the remaining ground inside the white boundary.`,
+      notes: `Small banner ${pad(i + 1)} filling the remaining ground inside the plot rectangle.`,
       minBidCents: 60_000,
       widthM: 5,
       heightM: 2,
@@ -251,7 +241,7 @@ export function buildPlacementDefinitions(): PlacementDefinition[] {
       widthM: 0.9,
       heightM: 2.8,
       minBidCents: 50_000,
-      locationNote: `Boundary flag ${pad(i + 1)} of 32, standing on the white outline of the plot.`,
+      locationNote: `Boundary flag ${pad(i + 1)} of 32, standing on the outline of the plot.`,
       geometry: { kind: "pin", point },
     }),
   );

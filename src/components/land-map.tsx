@@ -7,6 +7,7 @@ import { formatEuroFromCents } from "@/lib/auction/money";
 import { PlacementShape } from "@/components/placement-shape";
 import { MapControls } from "@/components/map-controls";
 import { MapFilters, type MapFilter, type MapView } from "@/components/map-filters";
+import { PLOT_OUTLINE } from "@/lib/auction/inventory";
 import { trackClientEvent } from "@/lib/analytics";
 
 export function LandMap({
@@ -30,8 +31,6 @@ export function LandMap({
   const [hoverId, setHoverId] = useState<string | null>(null);
   const drag = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
   const viewed = useRef(false);
-  const imgSrc =
-    failedSrc === landImagePath ? "/images/land-aerial.svg" : landImagePath;
   useEffect(() => {
     if (!viewed.current) {
       viewed.current = true;
@@ -68,6 +67,7 @@ export function LandMap({
   }
 
   const hover = placements.find((p) => p.id === hoverId);
+  const plotPoints = PLOT_OUTLINE.map((p) => `${p.x},${p.y}`).join(" ");
 
   return (
     <div className="flex flex-col gap-3">
@@ -76,7 +76,7 @@ export function LandMap({
         <MapFilters filter={filter} onFilter={setFilter} view={view} onView={setView} />
       </div>
       <div
-        className={`relative overflow-hidden rounded-2xl border border-border bg-[#2a3324] shadow-[0_20px_60px_-30px_rgba(17,18,15,0.45)] ${view === "final" ? "aspect-[1672/940]" : "aspect-[1170/810]"}`}
+        className={`relative overflow-hidden rounded-2xl border border-border bg-[#11120f] shadow-[0_20px_60px_-30px_rgba(17,18,15,0.45)] ${view === "final" ? "aspect-[1672/940]" : "aspect-[3/2]"}`}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -88,29 +88,46 @@ export function LandMap({
             transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
           }}
         >
-          <Image
-            src={view === "final" ? "/images/land-final-vision.jpg" : imgSrc}
-            alt={
-              view === "final"
-                ? "Final vision of Brand My Land with banners and flags laid out on the plot"
-                : "Satellite view of the Brand My Land plot in São Vicente, Madeira. White lines mark the land."
-            }
-            fill
-            className="object-contain"
-            onError={() => {
-              if (view !== "final") setFailedSrc(landImagePath);
-            }}
-            draggable={false}
-            priority
-            unoptimized
-          />
+          {view === "final" ? (
+            <Image
+              src="/images/land-final-vision.jpg"
+              alt="Final vision of Brand My Land with banners and flags laid out on the plot"
+              fill
+              className="object-contain"
+              draggable={false}
+              priority
+              unoptimized
+            />
+          ) : (
+            <>
+              <Image
+                src={failedSrc ?? "/images/sao-vicente.jpg"}
+                alt="São Vicente, Madeira — the mountains and coast behind the plot"
+                fill
+                className="scale-110 object-cover blur-md"
+                onError={() => setFailedSrc(landImagePath)}
+                draggable={false}
+                priority
+                unoptimized
+              />
+              <div className="absolute inset-0 bg-[#11120f]/35" />
+            </>
+          )}
           {view === "live" ? (
           <svg
             viewBox="0 0 100 100"
+            preserveAspectRatio="none"
             className="absolute inset-0 size-full"
             role="img"
             aria-label="Interactive auction map of 85 placements"
           >
+            <polygon
+              points={plotPoints}
+              fill="none"
+              stroke="#c7ff35"
+              strokeWidth={0.45}
+              strokeLinejoin="round"
+            />
             {visible.map((placement) => (
               <PlacementShape
                 key={placement.id}
@@ -152,7 +169,7 @@ export function LandMap({
         ) : null}
         {view === "live" ? (
         <p className="pointer-events-none absolute top-3 left-3 rounded-lg border border-white/30 bg-black/55 px-2.5 py-1 text-[11px] text-white/90">
-          White lines mark the plot
+          The lime line is the plot
         </p>
         ) : (
         <p className="pointer-events-none absolute top-3 left-3 rounded-lg border border-white/30 bg-black/55 px-2.5 py-1 text-[11px] text-white/90">
