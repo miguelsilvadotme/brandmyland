@@ -2,13 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { formatDistanceToNowStrict } from "date-fns";
 import type { AuctionSettings, FaqItem, Milestone, PublicBid, PublicPlacement, AuctionMode, AdminSummary } from "@/lib/types";
-import { formatEuroFromCents } from "@/lib/auction/money";
 import { LandMap } from "@/components/land-map";
 import { LandLocation } from "@/components/land-location";
 import { LandPhotos } from "@/components/land-photos";
-import { MINIMUM_INVENTORY_CENTS } from "@/lib/auction/inventory";
+import { HeroBanner } from "@/components/hero-banner";
 import { PlacementDialog } from "@/components/placement-dialog";
 import { AuctionTable } from "@/components/auction-table";
 import { ActivityFeed } from "@/components/activity-feed";
@@ -19,11 +17,8 @@ import { FAQ } from "@/components/faq";
 import { FounderSection } from "@/components/founder-section";
 import { FinalCTA } from "@/components/final-cta";
 import { StorySection } from "@/components/story-section";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { trackClientEvent } from "@/lib/analytics";
 import { toast } from "sonner";
-import { googleEarthUrl, landCoordinateLabel } from "@/lib/config";
 
 export type Catalog = {
   settings: AuctionSettings;
@@ -46,30 +41,6 @@ function formatUtc(iso: string) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(iso))} UTC`;
-}
-
-function Remaining({ endAt }: { endAt: string }) {
-  const [label, setLabel] = useState(formatUtc(endAt));
-  useEffect(() => {
-    const tick = () => {
-      const end = new Date(endAt);
-      if (end.getTime() <= Date.now()) setLabel("Closed");
-      else setLabel(formatDistanceToNowStrict(end));
-    };
-    tick();
-    const id = setInterval(tick, 30_000);
-    return () => clearInterval(id);
-  }, [endAt]);
-  return <>{label}</>;
-}
-
-function Stat({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="rounded-2xl border border-border bg-card px-4 py-3">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-1 text-lg font-semibold tabular-nums">{value}</p>
-    </div>
-  );
 }
 
 export function AuctionExperience({
@@ -100,75 +71,22 @@ export function AuctionExperience({
     if (id) trackClientEvent("placement_selected", { placementId: id });
   }
 
-  const modeCopy =
-    catalog.settings.mode === "preview"
-      ? "Preview — the auction isn’t charging yet. Opening prices are the floor."
-      : catalog.settings.mode === "reservations"
-        ? "Reservations open — no cards charged yet."
-        : catalog.settings.mode === "closed"
-          ? "Auction closed — this page is the public archive."
-          : "Auction live.";
-
   return (
     <>
-      <section className="mx-auto grid max-w-7xl gap-8 px-4 pb-6 pt-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:pt-14">
-        <div>
-          <p className="text-sm font-medium text-muted-foreground">{catalog.settings.heroEyebrow}</p>
-          <h1 className="mt-3 max-w-xl text-4xl font-semibold tracking-tight md:text-6xl">
-            {catalog.settings.heroHeadline}
-          </h1>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-            {catalog.settings.heroBody}
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <a href="#the-land" className={cn(buttonVariants(), "h-11 px-5")}>
-              Explore the land
-            </a>
-            <a href="#how-it-works" className={cn(buttonVariants({ variant: "outline" }), "h-11 px-5")}>
-              How this works
-            </a>
-          </div>
-          <p className="mt-6 text-sm text-muted-foreground">{modeCopy}</p>
-          <p className="mt-4 max-w-md text-sm text-muted-foreground">
-            No guaranteed impressions. Just a very real piece of land and an
-            unnecessarily ambitious idea.
-          </p>
-        </div>
-        <div className="grid grid-cols-2 gap-3 content-start">
-          <Stat
-            label="Opening floor"
-            value={formatEuroFromCents(MINIMUM_INVENTORY_CENTS, { compact: true })}
-          />
-          <Stat label="Raised so far" value={formatEuroFromCents(catalog.summary.leadingBidTotalCents, { compact: true })} />
-          <Stat label="Number of bids" value={String(catalog.summary.validBidCount)} />
-          <Stat label="Auction time remaining" value={<Remaining endAt={catalog.settings.endAt} />} />
-          <p className="col-span-2 text-xs text-muted-foreground">
-            The opening floor is the combined minimum of all 85 spots. Below that, prints,
-            crew and municipality licences don’t cover the project.
-          </p>
-        </div>
-      </section>
+      <HeroBanner
+        raisedCents={catalog.summary.leadingBidTotalCents}
+        bidCount={catalog.summary.validBidCount}
+        endAt={catalog.settings.endAt}
+        mode={catalog.settings.mode}
+      />
 
       <section id="the-land" className="mx-auto max-w-7xl scroll-mt-24 px-4 py-6">
-        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2 className="text-2xl font-semibold">The land is the marketplace</h2>
-            <p className="text-sm text-muted-foreground">
-              85 independently auctioned positions on one 1,300 m² plot. Server time is
-              the authority. Auction window ends {formatUtc(catalog.settings.endAt)}.
-            </p>
-            <p className="mt-1 text-sm">
-              <a
-                href={googleEarthUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-mono tabular-nums underline-offset-2 hover:underline"
-              >
-                {landCoordinateLabel()}
-              </a>
-              <span className="text-muted-foreground"> · Google Earth</span>
-            </p>
-          </div>
+        <div className="mb-4">
+          <h2 className="text-2xl font-semibold">The land is the marketplace</h2>
+          <p className="text-sm text-muted-foreground">
+            85 spots on one 1,300 m² plot. Click a banner or flag to bid. Auction
+            ends {formatUtc(catalog.settings.endAt)}.
+          </p>
         </div>
         <LandMap
           placements={catalog.placements}

@@ -65,10 +65,10 @@ export function buildDefaultSettings(): AuctionSettings {
     ),
     landImagePath: "/images/land-aerial.jpg",
     siteName: "Brand My Land",
-    heroEyebrow: "A 1,300 m² internet experiment · São Vicente, Madeira",
+    heroEyebrow: "São Vicente, Madeira · 1,300 m²",
     heroHeadline: "Your brand. On my land.",
     heroBody:
-      "I’m covering a piece of Madeira with brands from the internet. Choose one of 85 physical placements, compete in a 30-day auction, and—subject to approval—your winning design will live on the land for one year and on this website permanently.",
+      "Bid on a real banner or flag on my field. If you win, your brand stays on the land for a year — and on this website after that.",
     storyHeading:
       "The internet has advertised on laptops, phones and cars. So I gave it 1,300 m² of Madeira.",
     storyBody:
