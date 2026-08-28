@@ -79,15 +79,6 @@ export function AuctionExperience({
         endAt={catalog.settings.endAt}
       />
 
-      <section
-        id="the-land"
-        className="mx-auto max-w-7xl scroll-mt-24 space-y-4 px-4 py-6"
-        aria-label="The land"
-      >
-        <LandLocation />
-        <LandPhotos />
-      </section>
-
       <section id="marketplace" className="mx-auto max-w-7xl scroll-mt-24 px-4 py-6">
         <LandMap
           placements={catalog.placements}
@@ -106,6 +97,15 @@ export function AuctionExperience({
         />
         <AuctionTable placements={catalog.placements} bids={catalog.bids} onSelect={select} />
         <ActivityFeed items={catalog.activity} />
+      </section>
+
+      <section
+        id="the-land"
+        className="mx-auto max-w-7xl scroll-mt-24 space-y-4 px-4 py-6"
+        aria-label="The land"
+      >
+        <LandLocation />
+        <LandPhotos />
       </section>
 
       <StorySection heading={catalog.settings.storyHeading} body={catalog.settings.storyBody} />
