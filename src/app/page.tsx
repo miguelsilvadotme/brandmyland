@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { JsonLd } from "@/components/json-ld";
 import { SiteHeader } from "@/components/site-header";
 import { ApprovalNotice } from "@/components/approval-notice";
@@ -15,6 +16,7 @@ export default async function HomePage({
 }) {
   const catalog = await getPublicCatalog();
   const params = await searchParams;
+  const jar = await cookies();
   return (
     <>
       <JsonLd settings={catalog.settings} />
@@ -24,7 +26,7 @@ export default async function HomePage({
         <AuctionExperience catalog={catalog} initialSpot={params.spot} bidFlash={params.bid} />
       </main>
       <SiteFooter settings={catalog.settings} />
-      <ConsentBanner />
+      <ConsentBanner hasConsent={Boolean(jar.get("bml_consent"))} />
     </>
   );
 }

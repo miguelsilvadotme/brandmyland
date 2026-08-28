@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { trackClientEvent } from "@/lib/analytics";
 
 function useDesktop() {
-  const [desktop, setDesktop] = useState(true);
+  const [desktop, setDesktop] = useState<boolean | null>(null);
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
     const apply = () => setDesktop(mq.matches);
@@ -134,7 +134,7 @@ export function PlacementDialog({
 }) {
   const desktop = useDesktop();
   const open = Boolean(placement);
-  if (!placement) return null;
+  if (!placement || desktop === null) return null;
   const inner = <Body placement={placement} bids={bids} mode={mode} />;
   if (desktop) {
     return (

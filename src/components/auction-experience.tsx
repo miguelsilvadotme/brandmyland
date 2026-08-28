@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { formatDistanceToNowStrict, format } from "date-fns";
+import { formatDistanceToNowStrict } from "date-fns";
 import type { AuctionSettings, FaqItem, Milestone, PublicBid, PublicPlacement, AuctionMode, AdminSummary } from "@/lib/types";
 import { formatEuroFromCents } from "@/lib/auction/money";
 import { LandMap } from "@/components/land-map";
@@ -33,7 +33,33 @@ export type Catalog = {
   paymentsSafe: boolean;
 };
 
-function Stat({ label, value }: { label: string; value: string }) {
+function formatUtc(iso: string) {
+  return `${new Intl.DateTimeFormat("en-GB", {
+    timeZone: "UTC",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(iso))} UTC`;
+}
+
+function Remaining({ endAt }: { endAt: string }) {
+  const [label, setLabel] = useState(formatUtc(endAt));
+  useEffect(() => {
+    const tick = () => {
+      const end = new Date(endAt);
+      if (end.getTime() <= Date.now()) setLabel("Closed");
+      else setLabel(formatDistanceToNowStrict(end));
+    };
+    tick();
+    const id = setInterval(tick, 30_000);
+    return () => clearInterval(id);
+  }, [endAt]);
+  return <>{label}</>;
+}
+
+function Stat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="rounded-2xl border border-border bg-card px-4 py-3">
       <p className="text-xs text-muted-foreground">{label}</p>
@@ -69,14 +95,6 @@ export function AuctionExperience({
     router.replace(url, { scroll: false });
     if (id) trackClientEvent("placement_selected", { placementId: id });
   }
-
-  const remaining = useMemo(() => {
-    try {
-      return formatDistanceToNowStrict(new Date(catalog.settings.endAt), { addSuffix: false });
-    } catch {
-      return "—";
-    }
-  }, [catalog.settings.endAt]);
 
   const modeCopy =
     catalog.settings.mode === "preview"
@@ -119,7 +137,7 @@ export function AuctionExperience({
             label="Placements with bids"
             value={`${catalog.summary.placementsWithBids} / ${catalog.summary.placementCount}`}
           />
-          <Stat label="Auction time remaining" value={remaining} />
+          <Stat label="Auction time remaining" value={<Remaining endAt={catalog.settings.endAt} />} />
         </div>
       </section>
 
@@ -129,8 +147,7 @@ export function AuctionExperience({
             <h2 className="text-2xl font-semibold">The land is the marketplace</h2>
             <p className="text-sm text-muted-foreground">
               85 independently auctioned positions on one 1,300 m² plot. Server time is
-              the authority; your local close is{" "}
-              {format(new Date(catalog.settings.endAt), "d MMM, HH:mm")}.
+              the authority. Auction window ends {formatUtc(catalog.settings.endAt)}.
             </p>
           </div>
         </div>

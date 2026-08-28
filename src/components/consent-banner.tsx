@@ -3,11 +3,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
-export function ConsentBanner() {
-  const [hidden, setHidden] = useState(() => {
-    if (typeof document === "undefined") return true;
-    return document.cookie.includes("bml_consent=");
-  });
+export function ConsentBanner({ hasConsent }: { hasConsent: boolean }) {
+  const [hidden, setHidden] = useState(hasConsent);
   if (hidden) return null;
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card p-4 shadow-lg">

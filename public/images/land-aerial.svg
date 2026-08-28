@@ -1,21 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="Placeholder overhead of terraced land in São Vicente">
   <defs>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#8ec5e8"/>
-      <stop offset="100%" stop-color="#d7e7c2"/>
+      <stop offset="0%" stop-color="#9ec9e6"/>
+      <stop offset="55%" stop-color="#d5e4c4"/>
+      <stop offset="100%" stop-color="#6f8a48"/>
     </linearGradient>
+    <pattern id="grain" width="8" height="8" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="0.6" fill="#11120f" opacity="0.08"/>
+    </pattern>
   </defs>
   <rect width="1600" height="1000" fill="url(#sky)"/>
-  <path d="M80 180 C 400 80, 1200 90, 1520 220 L 1540 860 C 1100 940, 500 930, 70 820 Z" fill="#3d5a2b"/>
-  <path d="M140 260 C 420 170, 1180 180, 1460 300 L 1470 820 C 1080 880, 520 870, 150 760 Z" fill="#4e6c34"/>
-  <g stroke="#2d451f" stroke-width="6" fill="none">
-    <path d="M180 340 C 500 280, 1100 290, 1420 380"/>
-    <path d="M170 430 C 520 370, 1080 380, 1430 470"/>
-    <path d="M165 520 C 530 460, 1070 470, 1435 560"/>
-    <path d="M170 610 C 540 550, 1060 560, 1428 650"/>
-    <path d="M190 700 C 560 650, 1040 655, 1400 730"/>
+  <ellipse cx="1180" cy="160" rx="90" ry="28" fill="#f7f3e4" opacity="0.7"/>
+  <path d="M70 210 C 420 70, 1220 90, 1530 240 L 1555 880 C 1080 960, 480 940, 60 810 Z" fill="#355226"/>
+  <path d="M130 270 C 440 150, 1180 170, 1470 310 L 1485 840 C 1060 900, 500 885, 140 770 Z" fill="#4b6a33"/>
+  <path d="M210 330 C 500 230, 1100 245, 1400 370 L 1410 790 C 1000 845, 540 830, 220 720 Z" fill="#5b7d3c"/>
+  <g stroke="#2a421c" stroke-width="7" fill="none" opacity="0.45">
+    <path d="M200 360 C 520 290, 1080 305, 1400 400"/>
+    <path d="M190 450 C 530 380, 1070 395, 1410 490"/>
+    <path d="M185 540 C 540 470, 1060 485, 1415 580"/>
+    <path d="M195 630 C 550 570, 1050 580, 1405 670"/>
+    <path d="M220 720 C 560 670, 1030 678, 1370 750"/>
   </g>
-  <path d="M200 250 C 380 210, 700 240, 900 300 C 700 360, 360 340, 200 250Z" fill="#6b8f45" opacity=".55"/>
-  <rect x="40" y="40" width="420" height="70" rx="12" fill="#11120f"/>
-  <text x="60" y="85" fill="#C7FF35" font-family="ui-sans-serif, system-ui" font-size="28">TODO: /public/images/land-aerial.jpg</text>
+  <path d="M260 300 C 520 240, 820 280, 980 360 C 740 410, 420 380, 260 300Z" fill="#7a9a4f" opacity=".5"/>
+  <rect width="1600" height="1000" fill="url(#grain)"/>
 </svg>

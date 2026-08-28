@@ -26,7 +26,7 @@ export function LandMap({
   const [view, setView] = useState<MapView>("live");
   const [scale, setScale] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [imgSrc, setImgSrc] = useState("/images/land-aerial.jpg");
+  const [imgSrc, setImgSrc] = useState("/images/land-aerial.svg");
   const [hoverId, setHoverId] = useState<string | null>(null);
   const drag = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
   const viewed = useRef(false);
@@ -100,7 +100,7 @@ export function LandMap({
             transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
           }}
         >
-          {/* TODO: replace /public/images/land-aerial.jpg with the calibrated drone photograph */}
+          {/* Swap this SVG for /public/images/land-aerial.jpg when the drone plate is ready. */}
           <Image
             src={imgSrc}
             alt="Overhead view of the Brand My Land plot in São Vicente, Madeira"

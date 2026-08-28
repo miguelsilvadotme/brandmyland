@@ -16,7 +16,12 @@ export function ActivityFeed({
             <li key={item.id} className="flex justify-between gap-3">
               <span>{item.message.replace(/ bid /, " bid on ")}</span>
               <time className="shrink-0 text-xs text-muted-foreground">
-                {new Date(item.createdAt).toLocaleTimeString()}
+                {new Intl.DateTimeFormat("en-GB", {
+                  timeZone: "UTC",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }).format(new Date(item.createdAt))}{" "}
+                UTC
               </time>
             </li>
           ))}
