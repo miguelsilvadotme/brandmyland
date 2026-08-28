@@ -77,7 +77,6 @@ export function AuctionExperience({
         raisedCents={catalog.summary.leadingBidTotalCents}
         bidCount={catalog.summary.validBidCount}
         endAt={catalog.settings.endAt}
-        mode={catalog.settings.mode}
       />
 
       <section id="the-land" className="mx-auto max-w-7xl scroll-mt-24 px-4 py-6">
