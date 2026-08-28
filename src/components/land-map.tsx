@@ -28,15 +28,12 @@ export function LandMap({
   const [view, setView] = useState<MapView>("live");
   const [scale, setScale] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [imgSrc, setImgSrc] = useState(landImagePath);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const [hoverId, setHoverId] = useState<string | null>(null);
   const drag = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
   const viewed = useRef(false);
-
-  useEffect(() => {
-    setImgSrc(landImagePath);
-  }, [landImagePath]);
-
+  const imgSrc =
+    failedSrc === landImagePath ? "/images/land-aerial.svg" : landImagePath;
   useEffect(() => {
     if (!viewed.current) {
       viewed.current = true;
@@ -111,7 +108,7 @@ export function LandMap({
             alt="Satellite view of the Brand My Land plot in São Vicente, Madeira. White lines mark the land."
             fill
             className="object-contain"
-            onError={() => setImgSrc("/images/land-aerial.svg")}
+            onError={() => setFailedSrc(landImagePath)}
             draggable={false}
             priority
             unoptimized
