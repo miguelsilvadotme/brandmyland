@@ -13,7 +13,11 @@ export function MapControls({
   onReset: () => void;
 }) {
   return (
-    <div className="flex items-center gap-1" role="group" aria-label="Map controls">
+    <div
+      className="flex items-center gap-1 rounded-full border border-white/30 bg-card/90 p-1 shadow-md backdrop-blur-sm"
+      role="group"
+      aria-label="Map controls"
+    >
       <Button variant="outline" size="icon" onClick={onZoomIn} aria-label="Zoom in">
         <Plus />
       </Button>

@@ -69,17 +69,7 @@ export function LandMap({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <MapFilters filter={filter} onFilter={setFilter} view={view} onView={setView} />
-        <MapControls
-          onZoomIn={() => setScale((s) => Math.min(3, s + 0.2))}
-          onZoomOut={() => setScale((s) => Math.max(0.7, s - 0.2))}
-          onReset={() => {
-            setScale(1);
-            setPan({ x: 0, y: 0 });
-          }}
-        />
-      </div>
+      <MapFilters filter={filter} onFilter={setFilter} view={view} onView={setView} />
       <div
         className="relative aspect-[1170/810] overflow-hidden rounded-2xl border border-border bg-[#2a3324] shadow-[0_20px_60px_-30px_rgba(17,18,15,0.45)]"
         onPointerDown={onPointerDown}
@@ -128,6 +118,19 @@ export function LandMap({
             ))}
           </svg>
           ) : null}
+        </div>
+        <div
+          className="absolute top-3 right-3 z-10"
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          <MapControls
+            onZoomIn={() => setScale((s) => Math.min(3, s + 0.2))}
+            onZoomOut={() => setScale((s) => Math.max(0.7, s - 0.2))}
+            onReset={() => {
+              setScale(1);
+              setPan({ x: 0, y: 0 });
+            }}
+          />
         </div>
         {hover ? (
           <div className="pointer-events-none absolute bottom-3 left-3 max-w-xs rounded-xl border border-border bg-card/95 px-3 py-2 text-xs shadow-md">
