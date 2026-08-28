@@ -170,6 +170,7 @@ export function AuctionExperience({
           onSelect={select}
           demoLabel={catalog.settings.demoDataLabel}
           mode={catalog.settings.mode}
+          landImagePath={catalog.settings.landImagePath}
         />
         <LandLocation />
         <AuctionTable placements={catalog.placements} bids={catalog.bids} onSelect={select} />

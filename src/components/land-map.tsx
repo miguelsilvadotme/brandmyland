@@ -15,21 +15,27 @@ export function LandMap({
   onSelect,
   demoLabel,
   mode,
+  landImagePath = "/images/land-aerial.jpg",
 }: {
   placements: PublicPlacement[];
   selectedId?: string | null;
   onSelect: (id: string | null) => void;
   demoLabel?: string;
   mode: string;
+  landImagePath?: string;
 }) {
   const [filter, setFilter] = useState<MapFilter>("all");
   const [view, setView] = useState<MapView>("live");
   const [scale, setScale] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [imgSrc, setImgSrc] = useState("/images/land-aerial.svg");
+  const [imgSrc, setImgSrc] = useState(landImagePath);
   const [hoverId, setHoverId] = useState<string | null>(null);
   const drag = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
   const viewed = useRef(false);
+
+  useEffect(() => {
+    setImgSrc(landImagePath);
+  }, [landImagePath]);
 
   useEffect(() => {
     if (!viewed.current) {
@@ -88,7 +94,7 @@ export function LandMap({
         </p>
       ) : null}
       <div
-        className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-[#2a3324] shadow-[0_20px_60px_-30px_rgba(17,18,15,0.45)] md:aspect-[16/10]"
+        className="relative aspect-[1170/810] overflow-hidden rounded-2xl border border-border bg-[#2a3324] shadow-[0_20px_60px_-30px_rgba(17,18,15,0.45)]"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -100,12 +106,11 @@ export function LandMap({
             transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
           }}
         >
-          {/* Swap this SVG for /public/images/land-aerial.jpg when the drone plate is ready. */}
           <Image
             src={imgSrc}
-            alt="Overhead view of the Brand My Land plot in São Vicente, Madeira"
+            alt="Satellite view of the Brand My Land plot in São Vicente, Madeira. White lines mark the land."
             fill
-            className="object-cover"
+            className="object-contain"
             onError={() => setImgSrc("/images/land-aerial.svg")}
             draggable={false}
             priority
@@ -142,6 +147,9 @@ export function LandMap({
             </p>
           </div>
         ) : null}
+        <p className="pointer-events-none absolute top-3 left-3 rounded-lg border border-white/30 bg-black/55 px-2.5 py-1 text-[11px] text-white/90">
+          White lines mark the plot
+        </p>
         {visible.length === 0 ? (
           <p className="absolute inset-0 flex items-center justify-center bg-background/70 text-sm">
             No placements match this filter.

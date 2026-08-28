@@ -33,6 +33,11 @@ function pad(n: number, width = 2) {
   return String(n).padStart(width, "0");
 }
 
+/** Percent coords on /images/land-aerial.jpg, inside the white-outlined plot. */
+const PLOT_CX = 47;
+const PLOT_CY = 43;
+const PLOT_Y_SQUASH = 0.62;
+
 function ringBanners(args: {
   count: number;
   radius: number;
@@ -51,8 +56,8 @@ function ringBanners(args: {
   return Array.from({ length: count }, (_, i) => {
     const angle = startAngle + (360 / count) * i;
     const rad = (angle * Math.PI) / 180;
-    const cx = 50 + radius * Math.cos(rad);
-    const cy = 49 + radius * Math.sin(rad) * 0.78;
+    const cx = PLOT_CX + radius * Math.cos(rad);
+    const cy = PLOT_CY + radius * Math.sin(rad) * PLOT_Y_SQUASH;
     const id = `${prefix}-${pad(i + 1)}`;
     return {
       id,
@@ -80,7 +85,7 @@ function ellipsePins(
 ): Point[] {
   return Array.from({ length: count }, (_, i) => {
     const angle = ((startAngle + (360 / count) * i) * Math.PI) / 180;
-    return pt(50 + rx * Math.cos(angle), 50 + ry * Math.sin(angle));
+    return pt(PLOT_CX + rx * Math.cos(angle), PLOT_CY + ry * Math.sin(angle));
   });
 }
 
@@ -98,15 +103,15 @@ export function buildPlacementDefinitions(): PlacementDefinition[] {
       "The dominant ground banner at the centre of the plot — the piece every overhead shot will find first.",
     geometry: {
       kind: "rect",
-      points: rotatedRect(50, 49, 16.4, 5.4, 0),
+      points: rotatedRect(PLOT_CX, PLOT_CY, 13.2, 4.4, -4),
     },
   };
 
   const large = ringBanners({
     count: 6,
-    radius: 13.6,
-    w: 11.2,
-    h: 4.4,
+    radius: 11.2,
+    w: 9.4,
+    h: 3.6,
     prefix: "B-L",
     tier: "large",
     widthM: 10,
@@ -119,9 +124,9 @@ export function buildPlacementDefinitions(): PlacementDefinition[] {
 
   const medium = ringBanners({
     count: 14,
-    radius: 23.2,
-    w: 8.2,
-    h: 3.4,
+    radius: 18.6,
+    w: 6.8,
+    h: 2.8,
     prefix: "B-M",
     tier: "medium",
     widthM: 7,
@@ -135,9 +140,9 @@ export function buildPlacementDefinitions(): PlacementDefinition[] {
 
   const small = ringBanners({
     count: 28,
-    radius: 32.4,
-    w: 6.1,
-    h: 2.4,
+    radius: 25.4,
+    w: 5.1,
+    h: 2.0,
     prefix: "B-S",
     tier: "small",
     widthM: 5,
@@ -156,10 +161,10 @@ export function buildPlacementDefinitions(): PlacementDefinition[] {
     "Southwest terrace — sits against the darker laurel edge.",
   ];
   const landmarkPoints: Point[] = [
-    pt(14.5, 16.5),
-    pt(85.5, 16.8),
-    pt(86.2, 83.4),
-    pt(13.8, 83.1),
+    pt(18.5, 18.5),
+    pt(76.5, 19.2),
+    pt(80.2, 66.4),
+    pt(17.8, 68.1),
   ];
   const landmark: PlacementDefinition[] = landmarkPoints.map((point, i) => ({
     id: `F-L-${pad(i + 1)}`,
@@ -174,7 +179,7 @@ export function buildPlacementDefinitions(): PlacementDefinition[] {
     geometry: { kind: "pin", point },
   }));
 
-  const perimeterPoints = ellipsePins(32, 41.5, 38.5, -90);
+  const perimeterPoints = ellipsePins(32, 33.5, 24.8, -90);
   const perimeter: PlacementDefinition[] = perimeterPoints.map((point, i) => ({
     id: `F-P-${pad(i + 1)}`,
     type: "flag",
