@@ -1,9 +1,7 @@
 "use client";
 
-import { format } from "date-fns";
 import type { AuctionMode, PublicBid, PublicPlacement } from "@/lib/types";
-import { formatEuroFromCents } from "@/lib/auction/money";
-import { nextMinimumBidCents } from "@/lib/auction/rules";
+import { euroPlain } from "@/lib/auction/money";
 import { BidForm } from "@/components/bid-form";
 import {
   Dialog,
@@ -20,8 +18,6 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { trackClientEvent } from "@/lib/analytics";
 
 function useDesktop() {
   const [desktop, setDesktop] = useState<boolean | null>(null);
@@ -35,134 +31,69 @@ function useDesktop() {
   return desktop;
 }
 
-function Body({
-  placement,
-  bids,
-  mode,
-}: {
-  placement: PublicPlacement;
-  bids: PublicBid[];
-  mode: AuctionMode;
-}) {
-  const min = nextMinimumBidCents(placement.currentBidCents, placement.minBidCents);
-  const end = new Date(placement.endsAt);
+function Header({ placement }: { placement: PublicPlacement }) {
+  const current = placement.currentBidCents ?? placement.minBidCents;
+  const brand = placement.leadingBrand?.displayName;
   return (
-    <div className="flex max-h-[70vh] flex-col gap-4 overflow-y-auto pr-1">
-      <p className="text-sm text-muted-foreground">
-        {placement.type} · {placement.tier} · {placement.sizeLabel}
+    <div className="pr-8">
+      <p className="text-[15px] font-semibold tracking-tight">
+        {placement.id} · {placement.name}
       </p>
-      <dl className="grid grid-cols-2 gap-2 text-sm">
-        <div>
-          <dt className="text-muted-foreground">Current bid</dt>
-          <dd className="font-semibold">
-            {placement.currentBidCents
-              ? formatEuroFromCents(placement.currentBidCents)
-              : `Opening ${formatEuroFromCents(placement.minBidCents)}`}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">Bids</dt>
-          <dd className="font-semibold">{placement.bidCount}</dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">Leading brand</dt>
-          <dd>
-            {placement.leadingBrand?.isDemo ? "Sample · " : ""}
-            {placement.leadingBrand?.displayName ?? "—"}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">Closes</dt>
-          <dd>
-            {format(end, "d MMM yyyy, HH:mm")} local
-            <span className="block text-xs text-muted-foreground">
-              {format(end, "d MMM yyyy, HH:mm")} UTC clock on the server
-            </span>
-          </dd>
-        </div>
-      </dl>
-      <p className="text-sm">{placement.locationNote}</p>
-      <p className="text-sm">
-        Minimum next bid: <strong>{formatEuroFromCents(min)}</strong>
+      <p className="mt-1 text-sm capitalize text-muted-foreground">
+        {placement.tier} {placement.type} · {placement.sizeLabel}
       </p>
-      <div>
-        <h3 className="mb-2 text-sm font-semibold">Bid history</h3>
-        {bids.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No bids yet on this placement.</p>
-        ) : (
-          <ul className="space-y-1 text-sm">
-            {bids.map((bid) => (
-              <li key={bid.id} className="flex justify-between gap-2 border-b border-border/60 py-1">
-                <span>
-                  {bid.publicBidderName}
-                  {bid.brand?.isDemo ? " (sample)" : ""}
-                </span>
-                <span>{formatEuroFromCents(bid.amountCents)}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-      <div className="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={async () => {
-            const url = `${window.location.origin}/spot/${placement.id}`;
-            await navigator.clipboard.writeText(url);
-            trackClientEvent("share_clicked", { placementId: placement.id });
-          }}
-        >
-          Copy share link
-        </Button>
-      </div>
-      <BidForm placement={placement} mode={mode} />
+      <p className="mt-1 text-sm">
+        {placement.currentBidCents ? "Current bid" : "Opening bid"}{" "}
+        <span className="font-semibold">{euroPlain(current)}</span>
+        {brand ? ` by ${brand}` : ""}
+        {placement.bidCount ? ` · ${placement.bidCount} bids` : " · no bids yet"}
+      </p>
     </div>
   );
 }
 
 export function PlacementDialog({
   placement,
-  bids,
   mode,
   onClose,
 }: {
   placement: PublicPlacement | null;
-  bids: PublicBid[];
+  bids?: PublicBid[];
   mode: AuctionMode;
   onClose: () => void;
 }) {
   const desktop = useDesktop();
   const open = Boolean(placement);
   if (!placement || desktop === null) return null;
-  const inner = <Body placement={placement} bids={bids} mode={mode} />;
   if (desktop) {
     return (
       <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>
+        <DialogContent className="max-h-[90vh] overflow-y-auto rounded-3xl p-6 sm:max-w-[420px]">
+          <DialogHeader className="gap-0">
+            <DialogTitle className="sr-only">
               {placement.id} · {placement.name}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="sr-only">
               Place a bid on this Madeira field position.
             </DialogDescription>
+            <Header placement={placement} />
           </DialogHeader>
-          {inner}
+          <BidForm placement={placement} mode={mode} />
         </DialogContent>
       </Dialog>
     );
   }
   return (
     <Drawer open={open} onOpenChange={(v) => !v && onClose()}>
-      <DrawerContent className="p-4">
-        <DrawerHeader>
-          <DrawerTitle>
+      <DrawerContent className="max-h-[92vh] overflow-y-auto p-5">
+        <DrawerHeader className="px-0 text-left">
+          <DrawerTitle className="sr-only">
             {placement.id} · {placement.name}
           </DrawerTitle>
-          <DrawerDescription>Bid on this placement</DrawerDescription>
+          <DrawerDescription className="sr-only">Bid on this placement</DrawerDescription>
+          <Header placement={placement} />
         </DrawerHeader>
-        {inner}
+        <BidForm placement={placement} mode={mode} />
       </DrawerContent>
     </Drawer>
   );

@@ -13,6 +13,10 @@ export function centsToEuros(cents: number): number {
   return cents / EUR_CENTS;
 }
 
+export function euroPlain(cents: number): string {
+  return `${Math.round(cents / EUR_CENTS).toLocaleString("en-IE")} €`;
+}
+
 export function formatEuroFromCents(
   cents: number,
   options: { compact?: boolean } = {},

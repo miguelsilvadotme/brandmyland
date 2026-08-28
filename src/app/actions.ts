@@ -59,7 +59,10 @@ export async function submitBidAction(raw: unknown) {
   if (!parsed.success) {
     return { ok: false as const, error: parsed.error.issues[0]?.message ?? "Invalid form" };
   }
-  const data = parsed.data;
+  const data = {
+    ...parsed.data,
+    companyWebsite: parsed.data.companyWebsite ?? "",
+  };
   const mode = resolveAuctionMode();
   if (mode === "preview") {
     return {

@@ -1,19 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { Upload } from "lucide-react";
 import type { AuctionMode, PublicPlacement } from "@/lib/types";
-import { formatEuroFromCents, parseEuroInputToCents } from "@/lib/auction/money";
+import { euroPlain, parseEuroInputToCents } from "@/lib/auction/money";
 import { nextMinimumBidCents } from "@/lib/auction/rules";
-import { REGULATORY_ACKNOWLEDGEMENT } from "@/lib/config";
 import { submitBidAction } from "@/app/actions";
 import { DepositSummary } from "@/components/deposit-summary";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { trackClientEvent } from "@/lib/analytics";
+import { cn } from "@/lib/utils";
+
+const fieldClass =
+  "h-10 rounded-lg border-border bg-background px-3 text-sm focus-visible:border-foreground focus-visible:ring-0";
 
 export function BidForm({
   placement,
@@ -24,32 +27,41 @@ export function BidForm({
 }) {
   const min = nextMinimumBidCents(placement.currentBidCents, placement.minBidCents);
   const [amount, setAmount] = useState(String(Math.round(min / 100)));
+  const [brand, setBrand] = useState("");
   const [pending, setPending] = useState(false);
-  const [terms, setTerms] = useState(false);
-  const [reg, setReg] = useState(false);
+  const [accepted, setAccepted] = useState(false);
+  const [logoName, setLogoName] = useState<string | null>(null);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const cents = parseEuroInputToCents(amount) ?? 0;
   const disabled =
     mode === "preview" || mode === "closed" || pending || placement.status === "closed";
+  const rival = placement.leadingBrand?.displayName;
+  const cta =
+    mode === "reservations"
+      ? "Register interest"
+      : rival
+        ? `Outbid ${rival}`
+        : "Place a bid";
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const form = e.currentTarget as HTMLFormElement;
+    const form = e.currentTarget;
     const data = new FormData(form);
+    const website = String(data.get("companyWebsite") ?? "").trim();
     trackClientEvent("bid_started", { placementId: placement.id });
     setPending(true);
     try {
       const result = await submitBidAction({
         placementId: placement.id,
         amountCents: cents,
-        fullName: String(data.get("fullName") ?? ""),
+        fullName: brand.trim(),
         workEmail: String(data.get("workEmail") ?? ""),
-        companyName: String(data.get("companyName") ?? ""),
-        companyWebsite: String(data.get("companyWebsite") ?? ""),
+        companyName: brand.trim(),
+        companyWebsite: website,
         twitterHandle: String(data.get("twitterHandle") ?? "") || undefined,
-        publicMessage: String(data.get("publicMessage") ?? "") || undefined,
-        hidePublicName: data.get("hidePublicName") === "on",
-        acceptTerms: terms,
-        acceptRegulatory: reg,
+        acceptTerms: accepted,
+        acceptRegulatory: accepted,
       });
       if (result && "ok" in result && !result.ok) {
         toast.error(result.error);
@@ -71,94 +83,163 @@ export function BidForm({
   }
 
   return (
-    <form className="flex flex-col gap-3" onSubmit={onSubmit}>
-      {mode === "preview" ? (
-        <p className="rounded-lg bg-muted px-3 py-2 text-xs">
-          Preview mode: the map is explorable, but bids are not accepted yet.
+    <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+      {mode !== "live" ? (
+        <p className="text-xs text-muted-foreground">
+          {mode === "preview"
+            ? "Preview — you can fill this in, but bids are not charged yet."
+            : mode === "reservations"
+              ? "Reservations are open. No card is charged yet."
+              : "This auction is closed."}
         </p>
       ) : null}
-      {mode === "reservations" ? (
-        <p className="rounded-lg bg-muted px-3 py-2 text-xs">
-          Reservations are open. We will collect verified interest without charging a
-          card.
+
+      <div>
+        <Label htmlFor="amount" className="text-xs font-semibold text-foreground">
+          Your bid (EUR)
+        </Label>
+        <div className="relative mt-1.5">
+          <Input
+            id="amount"
+            name="amount"
+            inputMode="decimal"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            aria-describedby="min-bid"
+            className={cn(fieldClass, "pr-8")}
+          />
+          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">
+            €
+          </span>
+        </div>
+        <p id="min-bid" className="mt-1 text-xs text-muted-foreground">
+          Minimum {euroPlain(min)}
         </p>
-      ) : null}
-      {mode === "closed" ? (
-        <p className="rounded-lg bg-muted px-3 py-2 text-xs">
-          This auction is closed. The map remains as a public archive.
-        </p>
-      ) : null}
-      <div className="grid gap-1.5">
-        <Label htmlFor="amount">Bid amount (EUR)</Label>
-        <Input
-          id="amount"
-          name="amount"
-          inputMode="decimal"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          aria-describedby="min-bid"
+      </div>
+
+      <DepositSummary amountCents={Math.max(cents, min)} />
+
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <Label htmlFor="companyName" className="text-xs font-semibold">
+            Brand name
+          </Label>
+          <Input
+            id="companyName"
+            name="companyName"
+            required
+            value={brand}
+            onChange={(e) => setBrand(e.target.value)}
+            className={cn(fieldClass, "mt-1.5")}
+          />
+        </div>
+        <div>
+          <Label htmlFor="workEmail" className="text-xs font-semibold">
+            Email
+          </Label>
+          <Input
+            id="workEmail"
+            name="workEmail"
+            type="email"
+            required
+            autoComplete="email"
+            className={cn(fieldClass, "mt-1.5")}
+          />
+        </div>
+        <div>
+          <Label htmlFor="companyWebsite" className="text-xs font-semibold">
+            Website <span className="font-normal text-muted-foreground">(optional)</span>
+          </Label>
+          <Input
+            id="companyWebsite"
+            name="companyWebsite"
+            type="url"
+            placeholder="https://"
+            className={cn(fieldClass, "mt-1.5")}
+          />
+        </div>
+        <div>
+          <Label htmlFor="twitterHandle" className="text-xs font-semibold">
+            X handle <span className="font-normal text-muted-foreground">(optional)</span>
+          </Label>
+          <Input
+            id="twitterHandle"
+            name="twitterHandle"
+            placeholder="@"
+            className={cn(fieldClass, "mt-1.5")}
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label className="text-xs font-semibold">Logo</Label>
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          className="relative mt-1.5 flex h-24 w-full items-center justify-center rounded-xl bg-muted px-4"
+        >
+          {logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={logoUrl} alt="" className="max-h-16 max-w-[40%] object-contain" />
+          ) : (
+            <span className="absolute left-4 size-10 rounded-md bg-foreground" aria-hidden />
+          )}
+          <span className="font-medium">{brand || "Your brand"}</span>
+          <Upload className="absolute top-3 right-3 size-4 text-muted-foreground" />
+        </button>
+        <input
+          ref={fileRef}
+          id="logo"
+          name="logo"
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            setLogoName(file?.name ?? null);
+            if (logoUrl) URL.revokeObjectURL(logoUrl);
+            setLogoUrl(file ? URL.createObjectURL(file) : null);
+          }}
         />
-        <p id="min-bid" className="text-xs text-muted-foreground">
-          Minimum valid next bid: {formatEuroFromCents(min)}
-        </p>
+        {logoName ? (
+          <p className="mt-1 text-[11px] text-muted-foreground">{logoName}</p>
+        ) : null}
+        <label className="mt-2 flex items-start gap-2 text-xs leading-snug">
+          <Checkbox className="mt-0.5" />
+          <span>
+            My artwork already includes my brand name.{" "}
+            <span className="text-muted-foreground">
+              Tick this and the file is used full size.
+            </span>
+          </span>
+        </label>
       </div>
-      <div className="grid gap-1.5">
-        <Label htmlFor="fullName">Full name</Label>
-        <Input id="fullName" name="fullName" required autoComplete="name" />
-      </div>
-      <div className="grid gap-1.5">
-        <Label htmlFor="workEmail">Work email</Label>
-        <Input id="workEmail" name="workEmail" type="email" required autoComplete="email" />
-      </div>
-      <div className="grid gap-1.5">
-        <Label htmlFor="companyName">Company / brand name</Label>
-        <Input id="companyName" name="companyName" required />
-      </div>
-      <div className="grid gap-1.5">
-        <Label htmlFor="companyWebsite">Company website</Label>
-        <Input id="companyWebsite" name="companyWebsite" type="url" required placeholder="https://" />
-      </div>
-      <div className="grid gap-1.5">
-        <Label htmlFor="twitterHandle">X / Twitter handle (optional)</Label>
-        <Input id="twitterHandle" name="twitterHandle" placeholder="@brand" />
-      </div>
-      <div className="grid gap-1.5">
-        <Label htmlFor="logo">Logo upload (optional at bidding)</Label>
-        <Input id="logo" name="logo" type="file" accept="image/*" />
-      </div>
-      <div className="grid gap-1.5">
-        <Label htmlFor="publicMessage">Short public message (optional)</Label>
-        <Textarea id="publicMessage" name="publicMessage" maxLength={280} />
-      </div>
-      <label className="flex items-start gap-2 text-sm">
+
+      <label className="flex items-start gap-2 text-xs leading-snug text-muted-foreground">
         <Checkbox
-          checked={terms}
-          onCheckedChange={(v) => setTerms(v === true)}
+          checked={accepted}
+          onCheckedChange={(v) => setAccepted(v === true)}
+          className="mt-0.5"
         />
         <span>
           I accept the{" "}
-          <a href="/terms" className="underline" target="_blank" rel="noreferrer">
-            auction terms
-          </a>
-          .
+          <a href="/terms" className="underline underline-offset-2" target="_blank" rel="noreferrer">
+            terms
+          </a>{" "}
+          and that physical installation needs approval.
         </span>
       </label>
-      <label className="flex items-start gap-2 text-sm">
-        <Checkbox checked={reg} onCheckedChange={(v) => setReg(v === true)} />
-        <span>{REGULATORY_ACKNOWLEDGEMENT}</span>
-      </label>
-      <label className="flex items-start gap-2 text-sm">
-        <input type="checkbox" name="hidePublicName" className="mt-1 size-4" />
-        Hide my personal name on the public bid history
-      </label>
-      <DepositSummary amountCents={Math.max(cents, min)} />
-      <Button type="submit" disabled={disabled || !terms || !reg} className="h-11">
-        {pending
-          ? "Working…"
-          : mode === "reservations"
-            ? "Register interest"
-            : `Outbid ${formatEuroFromCents(min)}`}
+
+      <Button
+        type="submit"
+        disabled={disabled || !accepted}
+        className="h-12 w-full rounded-full text-base font-semibold"
+      >
+        {pending ? "Working…" : cta}
       </Button>
+      <p className="text-center text-[11px] text-muted-foreground">
+        I check every brand by hand before it goes on the land.
+      </p>
     </form>
   );
 }

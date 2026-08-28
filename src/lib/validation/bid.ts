@@ -6,7 +6,13 @@ export const bidFormSchema = z.object({
   fullName: z.string().trim().min(2).max(120),
   workEmail: z.string().trim().email().max(200),
   companyName: z.string().trim().min(2).max(120),
-  companyWebsite: z.string().trim().url().max(300),
+  companyWebsite: z
+    .string()
+    .trim()
+    .max(300)
+    .optional()
+    .or(z.literal(""))
+    .refine((v) => !v || /^https?:\/\//i.test(v), "Enter a full URL including https://"),
   twitterHandle: z.string().trim().max(80).optional().or(z.literal("")),
   publicMessage: z.string().trim().max(280).optional().or(z.literal("")),
   hidePublicName: z.boolean().optional(),
