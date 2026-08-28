@@ -5,5 +5,5 @@ The location section embeds a live satellite map (Google Maps) plus a Google Ear
 link. Overlay coordinates in `src/lib/auction/inventory.ts` are percentages of
 `land-aerial.jpg` and are meant to stay inside that white outline.
 
-`land-ground-01.jpg` … `land-ground-03.jpg` are phone photos of the plot from
-the ground, shown under the satellite map.
+`land-final-vision.jpg` is the illustrated layout shown when Final vision is
+selected on the map.

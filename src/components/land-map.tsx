@@ -94,15 +94,22 @@ export function LandMap({
           }}
         >
           <Image
-            src={imgSrc}
-            alt="Satellite view of the Brand My Land plot in São Vicente, Madeira. White lines mark the land."
+            src={view === "final" ? "/images/land-final-vision.jpg" : imgSrc}
+            alt={
+              view === "final"
+                ? "Final vision of Brand My Land with banners and flags laid out on the plot"
+                : "Satellite view of the Brand My Land plot in São Vicente, Madeira. White lines mark the land."
+            }
             fill
             className="object-contain"
-            onError={() => setFailedSrc(landImagePath)}
+            onError={() => {
+              if (view !== "final") setFailedSrc(landImagePath);
+            }}
             draggable={false}
             priority
             unoptimized
           />
+          {view === "live" ? (
           <svg
             viewBox="0 0 100 100"
             className="absolute inset-0 size-full"
@@ -120,6 +127,7 @@ export function LandMap({
               />
             ))}
           </svg>
+          ) : null}
         </div>
         {hover ? (
           <div className="pointer-events-none absolute bottom-3 left-3 max-w-xs rounded-xl border border-border bg-card/95 px-3 py-2 text-xs shadow-md">
@@ -134,10 +142,16 @@ export function LandMap({
             </p>
           </div>
         ) : null}
+        {view === "live" ? (
         <p className="pointer-events-none absolute top-3 left-3 rounded-lg border border-white/30 bg-black/55 px-2.5 py-1 text-[11px] text-white/90">
           White lines mark the plot
         </p>
-        {visible.length === 0 ? (
+        ) : (
+        <p className="pointer-events-none absolute top-3 left-3 rounded-lg border border-white/30 bg-black/55 px-2.5 py-1 text-[11px] text-white/90">
+          Final vision — how the land could look
+        </p>
+        )}
+        {view === "live" && visible.length === 0 ? (
           <p className="absolute inset-0 flex items-center justify-center bg-background/70 text-sm">
             No placements match this filter.
           </p>
