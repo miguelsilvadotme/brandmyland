@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils";
 
 type SortKey = "current" | "minimum" | "bids" | "ending" | "tier";
 
+const INITIAL_ROWS = 15;
+
 export function AuctionTable({
   placements,
   bids,
@@ -18,16 +20,21 @@ export function AuctionTable({
   bids: PublicBid[];
   onSelect: (id: string) => void;
 }) {
-  const [sort, setSort] = useState<SortKey>("minimum");
+  const [sort, setSort] = useState<SortKey>("current");
   const [type, setType] = useState<"all" | "banner" | "flag">("all");
   const [onlyOpen, setOnlyOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const rows = useMemo(() => {
     let list = placements.slice();
     if (type !== "all") list = list.filter((p) => p.type === type);
     if (onlyOpen) list = list.filter((p) => p.bidCount === 0);
     list.sort((a, b) => {
-      if (sort === "current") return (b.currentBidCents ?? 0) - (a.currentBidCents ?? 0);
+      if (sort === "current") {
+        const av = a.currentBidCents ?? a.minBidCents;
+        const bv = b.currentBidCents ?? b.minBidCents;
+        return bv - av;
+      }
       if (sort === "minimum") return b.minBidCents - a.minBidCents;
       if (sort === "bids") return b.bidCount - a.bidCount;
       if (sort === "ending") return a.endsAt.localeCompare(b.endsAt);
@@ -35,6 +42,9 @@ export function AuctionTable({
     });
     return list;
   }, [placements, sort, type, onlyOpen]);
+
+  const visible = expanded ? rows : rows.slice(0, INITIAL_ROWS);
+  const hiddenCount = Math.max(0, rows.length - INITIAL_ROWS);
 
   return (
     <section id="auction" className="mt-10 scroll-mt-24">
@@ -97,7 +107,7 @@ export function AuctionTable({
                     </tr>
                   </thead>
                   <tbody>
-                    {rows.map((p) => (
+                    {visible.map((p) => (
                       <tr key={p.id} className="border-t">
                         <td className="px-3 py-2 font-medium">{p.id}</td>
                         <td className="px-3 py-2 capitalize">
@@ -128,7 +138,7 @@ export function AuctionTable({
                 </table>
               </div>
               <div className="grid gap-3 md:hidden">
-                {rows.map((p) => (
+                {visible.map((p) => (
                   <button
                     key={p.id}
                     type="button"
@@ -147,6 +157,17 @@ export function AuctionTable({
                   </button>
                 ))}
               </div>
+              {hiddenCount > 0 ? (
+                <div className="mt-4 flex justify-center">
+                  <button
+                    type="button"
+                    className={cn(buttonVariants({ variant: expanded ? "outline" : "default" }), "h-10 px-5")}
+                    onClick={() => setExpanded((v) => !v)}
+                  >
+                    {expanded ? "Show less" : `Expand more · ${hiddenCount} spots`}
+                  </button>
+                </div>
+              ) : null}
             </>
           )}
         </TabsContent>
