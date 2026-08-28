@@ -29,18 +29,14 @@ export function MilestoneProgress({
               key={m.id}
               className={
                 isMillion
-                  ? "rounded-2xl border-2 border-foreground bg-lime p-5 md:col-span-2 md:p-6"
+                  ? "rounded-2xl border-2 border-foreground bg-lime p-4"
                   : "rounded-2xl border border-border bg-card p-4"
               }
             >
               {isMillion ? (
-                <p className="font-semibold tracking-tight">
-                  <span className="mr-2 inline-block text-4xl font-bold tabular-nums md:text-5xl">
-                    €1M
-                  </span>
-                  <span className="align-middle text-base md:text-lg">
-                    the impossible internet goal
-                  </span>
+                <p className="font-semibold">
+                  <span className="text-2xl font-bold tabular-nums">€1M</span>
+                  <span> — the impossible internet goal</span>
                 </p>
               ) : (
                 <p className="font-semibold">{m.label}</p>
@@ -48,7 +44,7 @@ export function MilestoneProgress({
               <p
                 className={
                   isMillion
-                    ? "mt-2 max-w-2xl text-sm text-foreground/80 md:text-base"
+                    ? "mt-1 text-sm text-foreground/80"
                     : "mt-1 text-sm text-muted-foreground"
                 }
               >
