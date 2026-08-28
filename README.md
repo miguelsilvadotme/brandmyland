@@ -10,7 +10,7 @@ npm install
 npm run dev
 ```
 
-Without Stripe or Supabase credentials the site runs in **preview** with a labelled demo dataset. Submissions are disabled until `NEXT_PUBLIC_AUCTION_MODE` is `reservations` or `live`.
+Without Stripe or Supabase credentials the site runs in **preview** with an empty auction map. Opening prices are the floor. Submissions are disabled until `NEXT_PUBLIC_AUCTION_MODE` is `reservations` or `live`.
 
 ```bash
 npm run lint

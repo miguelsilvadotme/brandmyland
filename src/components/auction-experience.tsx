@@ -7,6 +7,8 @@ import type { AuctionSettings, FaqItem, Milestone, PublicBid, PublicPlacement, A
 import { formatEuroFromCents } from "@/lib/auction/money";
 import { LandMap } from "@/components/land-map";
 import { LandLocation } from "@/components/land-location";
+import { LandPhotos } from "@/components/land-photos";
+import { MINIMUM_INVENTORY_CENTS } from "@/lib/auction/inventory";
 import { PlacementDialog } from "@/components/placement-dialog";
 import { AuctionTable } from "@/components/auction-table";
 import { ActivityFeed } from "@/components/activity-feed";
@@ -100,7 +102,7 @@ export function AuctionExperience({
 
   const modeCopy =
     catalog.settings.mode === "preview"
-      ? "Auction not started — exploring a labelled demo map."
+      ? "Preview — the auction isn’t charging yet. Opening prices are the floor."
       : catalog.settings.mode === "reservations"
         ? "Reservations open — no cards charged yet."
         : catalog.settings.mode === "closed"
@@ -128,18 +130,22 @@ export function AuctionExperience({
           </div>
           <p className="mt-6 text-sm text-muted-foreground">{modeCopy}</p>
           <p className="mt-4 max-w-md text-sm text-muted-foreground">
-            No guaranteed impressions. Just a very real piece of land, a drone and an
+            No guaranteed impressions. Just a very real piece of land and an
             unnecessarily ambitious idea.
           </p>
         </div>
         <div className="grid grid-cols-2 gap-3 content-start">
-          <Stat label="Total raised" value={formatEuroFromCents(catalog.summary.leadingBidTotalCents, { compact: true })} />
-          <Stat label="Number of bids" value={String(catalog.summary.validBidCount)} />
           <Stat
-            label="Placements with bids"
-            value={`${catalog.summary.placementsWithBids} / ${catalog.summary.placementCount}`}
+            label="Opening floor"
+            value={formatEuroFromCents(MINIMUM_INVENTORY_CENTS, { compact: true })}
           />
+          <Stat label="Raised so far" value={formatEuroFromCents(catalog.summary.leadingBidTotalCents, { compact: true })} />
+          <Stat label="Number of bids" value={String(catalog.summary.validBidCount)} />
           <Stat label="Auction time remaining" value={<Remaining endAt={catalog.settings.endAt} />} />
+          <p className="col-span-2 text-xs text-muted-foreground">
+            The opening floor is the combined minimum of all 85 spots. Below that, prints,
+            crew and municipality licences don’t cover the project.
+          </p>
         </div>
       </section>
 
@@ -168,11 +174,11 @@ export function AuctionExperience({
           placements={catalog.placements}
           selectedId={selected}
           onSelect={select}
-          demoLabel={catalog.settings.demoDataLabel}
           mode={catalog.settings.mode}
           landImagePath={catalog.settings.landImagePath}
         />
         <LandLocation />
+        <LandPhotos />
         <AuctionTable placements={catalog.placements} bids={catalog.bids} onSelect={select} />
         <ActivityFeed items={catalog.activity} />
       </section>

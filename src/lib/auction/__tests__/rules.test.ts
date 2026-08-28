@@ -13,7 +13,6 @@ import {
   confirmPaidBid,
   createEmptyStore,
   createPendingBid,
-  seedDemoStore,
 } from "@/lib/data/store";
 import type { BidFormInput } from "@/lib/types";
 
@@ -157,10 +156,10 @@ describe("stale and simultaneous bids", () => {
   });
 });
 
-describe("demo seed", () => {
-  it("labels sample brands as demo", () => {
-    const store = seedDemoStore(createEmptyStore());
-    expect(store.brands.every((b) => b.isDemo)).toBe(true);
-    expect(store.bids.length).toBeGreaterThan(0);
+describe("empty public store", () => {
+  it("starts with no bids on the map", () => {
+    const store = createEmptyStore();
+    expect(store.bids).toHaveLength(0);
+    expect(store.brands).toHaveLength(0);
   });
 });

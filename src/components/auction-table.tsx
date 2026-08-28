@@ -18,7 +18,7 @@ export function AuctionTable({
   bids: PublicBid[];
   onSelect: (id: string) => void;
 }) {
-  const [sort, setSort] = useState<SortKey>("current");
+  const [sort, setSort] = useState<SortKey>("minimum");
   const [type, setType] = useState<"all" | "banner" | "flag">("all");
   const [onlyOpen, setOnlyOpen] = useState(false);
 

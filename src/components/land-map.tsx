@@ -13,14 +13,12 @@ export function LandMap({
   placements,
   selectedId,
   onSelect,
-  demoLabel,
   mode,
   landImagePath = "/images/land-aerial.jpg",
 }: {
   placements: PublicPlacement[];
   selectedId?: string | null;
   onSelect: (id: string | null) => void;
-  demoLabel?: string;
   mode: string;
   landImagePath?: string;
 }) {
@@ -85,9 +83,12 @@ export function LandMap({
         />
       </div>
       {mode !== "live" ? (
-        <p className="rounded-lg border border-warning/50 bg-[#fff6e8] px-3 py-2 text-xs">
-          {demoLabel ?? "Sample / demo activity"} — this map is showing labelled sample bids
-          until the auction is live.
+        <p className="rounded-lg border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
+          {mode === "preview"
+            ? "Preview mode — opening prices on the map are the floor."
+            : mode === "reservations"
+              ? "Reservations are open. Cards are not charged until the live auction."
+              : "This auction is closed."}
         </p>
       ) : null}
       <div

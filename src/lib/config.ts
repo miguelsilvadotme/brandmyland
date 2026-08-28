@@ -118,7 +118,7 @@ export const DEFAULT_MILESTONES: Milestone[] = [
     amountCents: 10_030_000,
     label: "€100k — minimum inventory value",
     description:
-      "The combined opening bids of all 85 placements. Reaching it means the map is fully priced, not that the project is approved.",
+      "The combined opening bids of all 85 placements — the floor to cover prints, crew and municipality licences. Reaching it means the map is fully priced, not that the project is approved.",
   },
   {
     id: "viability",
@@ -148,7 +148,7 @@ export const DEFAULT_FAQS: FaqItem[] = [
     id: "is-this-real",
     question: "Is this real?",
     answer:
-      "Yes. The land is real, the auction is real and the intended banners and flags are physical. The concept is subject to regulatory, engineering and safety approval before production or installation.",
+      "Yes. This is my land in São Vicente, Madeira — the photos and the Google Earth pin are the real plot. The auction is real. I launched this page simply so the project could exist; I’ll add drone footage and polish if it gets traction. Physical banners and flags still need regulatory, engineering and safety approval before anything is installed.",
   },
   {
     id: "approval",
