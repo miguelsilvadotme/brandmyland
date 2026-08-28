@@ -4,12 +4,34 @@ import { useMemo, useState } from "react";
 import type { PublicBid, PublicPlacement } from "@/lib/types";
 import { formatEuroFromCents } from "@/lib/auction/money";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type SortKey = "current" | "minimum" | "bids" | "ending" | "tier";
+type ShowKey = "all" | "banner" | "flag" | "available";
 
 const INITIAL_ROWS = 15;
+
+const SORT_OPTIONS: { id: SortKey; label: string }[] = [
+  { id: "current", label: "Current bid" },
+  { id: "minimum", label: "Minimum bid" },
+  { id: "bids", label: "Most bids" },
+  { id: "ending", label: "Ending soon" },
+  { id: "tier", label: "Tier" },
+];
+
+const SHOW_OPTIONS: { id: ShowKey; label: string }[] = [
+  { id: "all", label: "All spots" },
+  { id: "banner", label: "Banners" },
+  { id: "flag", label: "Flags" },
+  { id: "available", label: "Available / no bids" },
+];
 
 export function AuctionTable({
   placements,
@@ -21,14 +43,14 @@ export function AuctionTable({
   onSelect: (id: string) => void;
 }) {
   const [sort, setSort] = useState<SortKey>("current");
-  const [type, setType] = useState<"all" | "banner" | "flag">("all");
-  const [onlyOpen, setOnlyOpen] = useState(false);
+  const [show, setShow] = useState<ShowKey>("all");
+  const [tab, setTab] = useState("spots");
   const [expanded, setExpanded] = useState(false);
 
   const rows = useMemo(() => {
     let list = placements.slice();
-    if (type !== "all") list = list.filter((p) => p.type === type);
-    if (onlyOpen) list = list.filter((p) => p.bidCount === 0);
+    if (show === "banner" || show === "flag") list = list.filter((p) => p.type === show);
+    if (show === "available") list = list.filter((p) => p.bidCount === 0);
     list.sort((a, b) => {
       if (sort === "current") {
         const av = a.currentBidCents ?? a.minBidCents;
@@ -41,56 +63,80 @@ export function AuctionTable({
       return a.tier.localeCompare(b.tier);
     });
     return list;
-  }, [placements, sort, type, onlyOpen]);
+  }, [placements, sort, show]);
 
   const visible = expanded ? rows : rows.slice(0, INITIAL_ROWS);
   const hiddenCount = Math.max(0, rows.length - INITIAL_ROWS);
 
   return (
     <section id="auction" className="mt-10 scroll-mt-24">
-      <Tabs defaultValue="spots">
-        <TabsList>
-          <TabsTrigger value="spots">Spots</TabsTrigger>
-          <TabsTrigger value="history">Bid history</TabsTrigger>
-        </TabsList>
-        <TabsContent value="spots" className="mt-4">
-          <div className="mb-3 flex flex-wrap gap-2">
-            {(
-              [
-                ["current", "Current bid"],
-                ["minimum", "Minimum bid"],
-                ["bids", "Most bids"],
-                ["ending", "Ending soon"],
-                ["tier", "Tier"],
-              ] as const
-            ).map(([key, label]) => (
-              <button
-                key={key}
-                type="button"
-                className={cn(
-                  "rounded-full border px-3 py-1 text-xs",
-                  sort === key ? "bg-foreground text-primary-foreground" : "bg-card",
-                )}
-                onClick={() => setSort(key)}
+      <Tabs
+        value={tab}
+        onValueChange={(value) => {
+          if (typeof value === "string") setTab(value);
+        }}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <TabsList>
+            <TabsTrigger value="spots">Spots</TabsTrigger>
+            <TabsTrigger value="history">Bid history</TabsTrigger>
+          </TabsList>
+          {tab === "spots" ? (
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <label className="sr-only" htmlFor="auction-sort">
+                Sort spots
+              </label>
+              <Select
+                value={sort}
+                onValueChange={(value) => {
+                  if (typeof value === "string") setSort(value as SortKey);
+                }}
               >
-                {label}
-              </button>
-            ))}
-            <button
-              type="button"
-              className="rounded-full border px-3 py-1 text-xs"
-              onClick={() => setType(type === "banner" ? "flag" : type === "flag" ? "all" : "banner")}
-            >
-              {type === "all" ? "Banner or flag" : type}
-            </button>
-            <button
-              type="button"
-              className="rounded-full border px-3 py-1 text-xs"
-              onClick={() => setOnlyOpen((v) => !v)}
-            >
-              {onlyOpen ? "Showing available" : "Available / no bids"}
-            </button>
-          </div>
+                <SelectTrigger
+                  id="auction-sort"
+                  size="sm"
+                  className="min-w-40 bg-card"
+                  aria-label="Sort spots"
+                >
+                  {SORT_OPTIONS.find((item) => item.id === sort)?.label ?? "Current bid"}
+                </SelectTrigger>
+                <SelectContent align="end" alignItemWithTrigger={false} className="min-w-40">
+                  {SORT_OPTIONS.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <label className="sr-only" htmlFor="auction-show">
+                Filter spots
+              </label>
+              <Select
+                value={show}
+                onValueChange={(value) => {
+                  if (typeof value === "string") setShow(value as ShowKey);
+                }}
+              >
+                <SelectTrigger
+                  id="auction-show"
+                  size="sm"
+                  className="min-w-40 bg-card"
+                  aria-label="Filter spots"
+                >
+                  {SHOW_OPTIONS.find((item) => item.id === show)?.label ?? "All spots"}
+                </SelectTrigger>
+                <SelectContent align="end" alignItemWithTrigger={false} className="min-w-40">
+                  {SHOW_OPTIONS.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : null}
+        </div>
+        <TabsContent value="spots" className="mt-4">
           {rows.length === 0 ? (
             <p className="rounded-xl border border-dashed p-6 text-sm">No placements match these filters.</p>
           ) : (
