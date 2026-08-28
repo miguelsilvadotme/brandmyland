@@ -49,7 +49,7 @@ export function MapFilters({
   onView: (v: MapView) => void;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2 md:justify-end">
       <label className="sr-only" htmlFor="map-filter">
         Placement filter
       </label>
@@ -67,7 +67,7 @@ export function MapFilters({
         >
           {FILTERS.find((item) => item.id === filter)?.label ?? "All"}
         </SelectTrigger>
-        <SelectContent align="start" alignItemWithTrigger={false} className="min-w-40">
+        <SelectContent align="end" alignItemWithTrigger={false} className="min-w-40">
           {FILTERS.map((item) => (
             <SelectItem key={item.id} value={item.id}>
               {item.label}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import type { PublicPlacement } from "@/lib/types";
 import { formatEuroFromCents } from "@/lib/auction/money";
@@ -14,11 +14,13 @@ export function LandMap({
   selectedId,
   onSelect,
   landImagePath = "/images/land-aerial.jpg",
+  heading,
 }: {
   placements: PublicPlacement[];
   selectedId?: string | null;
   onSelect: (id: string | null) => void;
   landImagePath?: string;
+  heading?: ReactNode;
 }) {
   const [filter, setFilter] = useState<MapFilter>("all");
   const [view, setView] = useState<MapView>("live");
@@ -69,7 +71,10 @@ export function LandMap({
 
   return (
     <div className="flex flex-col gap-3">
-      <MapFilters filter={filter} onFilter={setFilter} view={view} onView={setView} />
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-6">
+        {heading ? <div className="min-w-0">{heading}</div> : null}
+        <MapFilters filter={filter} onFilter={setFilter} view={view} onView={setView} />
+      </div>
       <div
         className={`relative overflow-hidden rounded-2xl border border-border bg-[#2a3324] shadow-[0_20px_60px_-30px_rgba(17,18,15,0.45)] ${view === "final" ? "aspect-[1672/940]" : "aspect-[1170/810]"}`}
         onPointerDown={onPointerDown}

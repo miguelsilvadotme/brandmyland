@@ -89,18 +89,20 @@ export function AuctionExperience({
       </section>
 
       <section id="marketplace" className="mx-auto max-w-7xl scroll-mt-24 px-4 py-6">
-        <div className="mb-4">
-          <h2 className="text-2xl font-semibold">The land is the marketplace</h2>
-          <p className="text-sm text-muted-foreground">
-            85 spots on one 1,300 m² plot. Click a banner or flag to bid. Auction
-            ends {formatUtc(catalog.settings.endAt)}.
-          </p>
-        </div>
         <LandMap
           placements={catalog.placements}
           selectedId={selected}
           onSelect={select}
           landImagePath={catalog.settings.landImagePath}
+          heading={
+            <>
+              <h2 className="text-2xl font-semibold">The land is the marketplace</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                85 spots on one 1,300 m² plot. Click a banner or flag to bid. Auction
+                ends {formatUtc(catalog.settings.endAt)}.
+              </p>
+            </>
+          }
         />
         <AuctionTable placements={catalog.placements} bids={catalog.bids} onSelect={select} />
         <ActivityFeed items={catalog.activity} />
