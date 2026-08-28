@@ -1,35 +1,38 @@
 export function HowItWorks() {
   const steps = [
     {
-      n: "01",
-      title: "Explore the land",
-      body: "Zoom into the map and choose a banner or flag based on size, position and current bid.",
+      n: "1",
+      title: "Pick your spot and size",
+      body: "85 banners and flags, priced by size and position on the field.",
     },
     {
-      n: "02",
-      title: "Place your bid",
-      body: "Pay a refundable 20% deposit. Each placement has its own live auction.",
+      n: "2",
+      title: "Win the bid",
+      body: "The top bid at the end of the auction wins. You pay a refundable 20% deposit.",
     },
     {
-      n: "03",
-      title: "Win your position",
-      body: "The highest valid bid wins, subject to brand review and the project receiving the required approvals.",
-    },
-    {
-      n: "04",
-      title: "Become part of the land",
-      body: "Winning artwork is produced for the planned one-year installation, filmed from above and archived permanently online.",
+      n: "3",
+      title: "Your brand stays on the land",
+      body: "I print and install it for a year — filmed from above, and kept on this website after that.",
     },
   ];
+
   return (
-    <section id="how-it-works" className="mx-auto max-w-7xl scroll-mt-24 px-4 py-16">
-      <h2 className="text-2xl font-semibold md:text-3xl">How it works</h2>
-      <ol className="mt-8 grid gap-6 md:grid-cols-2">
+    <section id="how-it-works" className="mx-auto max-w-3xl scroll-mt-24 px-4 py-16 md:py-20">
+      <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">How it works</h2>
+      <ol className="mt-12 space-y-10">
         {steps.map((s) => (
-          <li key={s.n} className="rounded-2xl border border-border bg-card p-6">
-            <p className="font-mono text-sm text-muted-foreground">{s.n}</p>
-            <h3 className="mt-2 text-xl font-semibold">{s.title}</h3>
-            <p className="mt-2 text-muted-foreground">{s.body}</p>
+          <li key={s.n} className="flex gap-4">
+            <span
+              className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-foreground text-sm font-medium text-background"
+              aria-hidden
+            >
+              {s.n}
+            </span>
+            <div>
+              <h3 className="text-lg font-semibold">{s.title}</h3>
+              <p className="mt-1 max-w-xl text-muted-foreground">{s.body}</p>
+            </div>
           </li>
         ))}
       </ol>
