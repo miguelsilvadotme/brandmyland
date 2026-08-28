@@ -5,7 +5,6 @@ import { formatEuroFromCents } from "@/lib/auction/money";
 import { MINIMUM_INVENTORY_CENTS } from "@/lib/auction/inventory";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { AuctionMode } from "@/lib/types";
 
 function auctionCountdown(endAt: string) {
   const end = new Date(endAt).getTime();
@@ -21,12 +20,10 @@ export function HeroBanner({
   raisedCents,
   bidCount,
   endAt,
-  mode,
 }: {
   raisedCents: number;
   bidCount: number;
   endAt: string;
-  mode: AuctionMode;
 }) {
   const [countdown, setCountdown] = useState("Auction ending soon");
   useEffect(() => {
@@ -40,14 +37,6 @@ export function HeroBanner({
   const pctOfFloor = floor > 0 ? (raisedCents / floor) * 100 : 0;
   const barPct = Math.min(100, Math.max(0, pctOfFloor));
   const passed = raisedCents >= floor;
-  const status =
-    mode === "live"
-      ? "you can still outbid any spot"
-      : mode === "reservations"
-        ? "reservations open — cards not charged yet"
-        : mode === "closed"
-          ? "this auction is closed"
-          : "preview — not charging yet";
 
   return (
     <section className="mx-auto max-w-3xl px-4 pb-8 pt-12 text-center md:pt-16">
@@ -94,9 +83,7 @@ export function HeroBanner({
             style={{ width: `${barPct}%` }}
           />
         </div>
-        <p className="mt-3 text-sm text-muted-foreground">
-          {countdown} · {status}
-        </p>
+        <p className="mt-3 text-sm text-muted-foreground">{countdown}</p>
         <p className="mt-1 text-xs text-muted-foreground">
           {bidCount} {bidCount === 1 ? "bid" : "bids"} · €100k unlocks the build. It covers
           printing, installation, crew and regulatory costs.
