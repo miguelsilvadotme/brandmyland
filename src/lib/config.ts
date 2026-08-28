@@ -76,8 +76,8 @@ export function buildDefaultSettings(): AuctionSettings {
     founderName: "Miguel",
     founderBio:
       "I’m a product designer and creator from Madeira. I like building ideas that are just plausible enough to become real and ridiculous enough for the internet to care. Brand My Land is the biggest one yet.",
-    founderPortraitPath: "/images/founder-placeholder.svg",
-    founderXUrl: env("FOUNDER_X_URL", "https://x.com"),
+    founderPortraitPath: "/images/founder.jpg",
+    founderXUrl: env("FOUNDER_X_URL", "https://x.com/miguelsilvame"),
     founderYoutubeUrl: env("FOUNDER_YOUTUBE_URL", "https://youtube.com"),
     founderEmail: env("FOUNDER_EMAIL", env("CONTACT_EMAIL", "hello@brandmyland.com")),
     legalEntityName: env("LEGAL_ENTITY_NAME", "[Legal entity name — draft]"),

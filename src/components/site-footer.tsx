@@ -42,11 +42,13 @@ export function SiteFooter({ settings }: { settings: AuctionSettings }) {
           </a>
         </div>
         <div className="flex flex-col gap-2 text-sm">
-          <a href={settings.founderXUrl} className="hover:underline">
+          <a
+            href={settings.founderXUrl}
+            className="hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             X
-          </a>
-          <a href={settings.founderYoutubeUrl} className="hover:underline">
-            YouTube
           </a>
           <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
             Brand My Land is an independent experimental sponsorship project. Physical
