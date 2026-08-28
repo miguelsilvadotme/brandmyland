@@ -13,13 +13,11 @@ export function LandMap({
   placements,
   selectedId,
   onSelect,
-  mode,
   landImagePath = "/images/land-aerial.jpg",
 }: {
   placements: PublicPlacement[];
   selectedId?: string | null;
   onSelect: (id: string | null) => void;
-  mode: string;
   landImagePath?: string;
 }) {
   const [filter, setFilter] = useState<MapFilter>("all");
@@ -82,15 +80,6 @@ export function LandMap({
           }}
         />
       </div>
-      {mode !== "live" ? (
-        <p className="rounded-lg border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
-          {mode === "preview"
-            ? "Preview mode — opening prices on the map are the floor."
-            : mode === "reservations"
-              ? "Reservations are open. Cards are not charged until the live auction."
-              : "This auction is closed."}
-        </p>
-      ) : null}
       <div
         className="relative aspect-[1170/810] overflow-hidden rounded-2xl border border-border bg-[#2a3324] shadow-[0_20px_60px_-30px_rgba(17,18,15,0.45)]"
         onPointerDown={onPointerDown}

@@ -92,7 +92,6 @@ export function AuctionExperience({
           placements={catalog.placements}
           selectedId={selected}
           onSelect={select}
-          mode={catalog.settings.mode}
           landImagePath={catalog.settings.landImagePath}
         />
         <LandLocation />
