@@ -104,13 +104,13 @@ export function LandMap({
                 src={failedSrc ?? "/images/sao-vicente.jpg"}
                 alt="São Vicente, Madeira — the mountains and coast behind the plot"
                 fill
-                className="scale-110 object-cover blur-md"
+                className="scale-110 object-cover blur-[6px]"
                 onError={() => setFailedSrc(landImagePath)}
                 draggable={false}
                 priority
                 unoptimized
               />
-              <div className="absolute inset-0 bg-[#11120f]/35" />
+              <div className="absolute inset-0 bg-[#11120f]/20" />
             </>
           )}
           {view === "live" ? (
