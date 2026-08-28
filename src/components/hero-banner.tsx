@@ -98,8 +98,8 @@ export function HeroBanner({
           {countdown} · {status}
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
-          {bidCount} {bidCount === 1 ? "bid" : "bids"} · the €100k floor covers prints, crew
-          and licences. Below that the project can’t happen.
+          {bidCount} {bidCount === 1 ? "bid" : "bids"} · €100k unlocks the build. It covers
+          printing, installation, crew and regulatory costs.
         </p>
       </div>
 
