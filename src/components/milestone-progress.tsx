@@ -22,12 +22,41 @@ export function MilestoneProgress({
       </div>
       <p className="mt-2 text-sm font-medium">{formatEuroFromCents(currentCents)} raised so far</p>
       <ol className="mt-6 grid gap-4 md:grid-cols-2">
-        {milestones.map((m) => (
-          <li key={m.id} className="rounded-2xl border border-border bg-card p-4">
-            <p className="font-semibold">{m.label}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{m.description}</p>
-          </li>
-        ))}
+        {milestones.map((m) => {
+          const isMillion = m.id === "impossible" || m.amountCents >= 100_000_000;
+          return (
+            <li
+              key={m.id}
+              className={
+                isMillion
+                  ? "rounded-2xl border-2 border-foreground bg-lime p-5 md:col-span-2 md:p-6"
+                  : "rounded-2xl border border-border bg-card p-4"
+              }
+            >
+              {isMillion ? (
+                <p className="font-semibold tracking-tight">
+                  <span className="mr-2 inline-block text-4xl font-bold tabular-nums md:text-5xl">
+                    €1M
+                  </span>
+                  <span className="align-middle text-base md:text-lg">
+                    the impossible internet goal
+                  </span>
+                </p>
+              ) : (
+                <p className="font-semibold">{m.label}</p>
+              )}
+              <p
+                className={
+                  isMillion
+                    ? "mt-2 max-w-2xl text-sm text-foreground/80 md:text-base"
+                    : "mt-1 text-sm text-muted-foreground"
+                }
+              >
+                {m.description}
+              </p>
+            </li>
+          );
+        })}
       </ol>
     </section>
   );

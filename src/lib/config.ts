@@ -139,7 +139,7 @@ export const DEFAULT_MILESTONES: Milestone[] = [
     amountCents: 100_000_000,
     label: "€1M — the impossible internet goal",
     description:
-      "The number that would make this an internet-scale composition. Reaching it would not waive engineering, weather or municipal requirements.",
+      "The number that would make this an internet-scale composition. Reaching it would not waive engineering, weather or municipal requirements. I will even do an inauguration party!",
   },
 ];
 
