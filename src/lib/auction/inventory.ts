@@ -33,138 +33,200 @@ function pad(n: number, width = 2) {
   return String(n).padStart(width, "0");
 }
 
-/** Percent coords on /images/land-aerial.jpg, inside the white-outlined plot. */
-const PLOT_CX = 47;
-const PLOT_CY = 43;
-const PLOT_Y_SQUASH = 0.62;
+/** White-outlined plot on /images/land-aerial.jpg, in 0–100 map space. */
+const PLOT = {
+  tl: { x: 16.5, y: 15.0 },
+  tr: { x: 73.5, y: 13.5 },
+  br: { x: 78.0, y: 63.5 },
+  bl: { x: 18.5, y: 73.0 },
+};
 
-function ringBanners(args: {
-  count: number;
-  radius: number;
-  w: number;
-  h: number;
-  prefix: string;
-  names: (i: number) => string;
-  notes: (i: number) => string;
-  minBidCents: number;
-  widthM: number;
-  heightM: number;
-  tier: PlacementDefinition["tier"];
-  startAngle?: number;
-}): PlacementDefinition[] {
-  const { count, radius, w, h, prefix, startAngle = -90 } = args;
-  return Array.from({ length: count }, (_, i) => {
-    const angle = startAngle + (360 / count) * i;
-    const rad = (angle * Math.PI) / 180;
-    const cx = PLOT_CX + radius * Math.cos(rad);
-    const cy = PLOT_CY + radius * Math.sin(rad) * PLOT_Y_SQUASH;
-    const id = `${prefix}-${pad(i + 1)}`;
-    return {
-      id,
-      type: "banner" as const,
-      tier: args.tier,
-      name: args.names(i + 1),
-      sizeLabel: `${args.widthM} × ${args.heightM} m`,
-      widthM: args.widthM,
-      heightM: args.heightM,
-      minBidCents: args.minBidCents,
-      locationNote: args.notes(i + 1),
-      geometry: {
-        kind: "rect" as const,
-        points: rotatedRect(cx, cy, w, h, angle + 90),
-      },
-    };
-  });
+function plotPoint(u: number, v: number): Point {
+  const { tl, tr, br, bl } = PLOT;
+  const x =
+    (1 - v) * ((1 - u) * tl.x + u * tr.x) + v * ((1 - u) * bl.x + u * br.x);
+  const y =
+    (1 - v) * ((1 - u) * tl.y + u * tr.y) + v * ((1 - u) * bl.y + u * br.y);
+  return pt(x, y);
 }
 
-function ellipsePins(
-  count: number,
-  rx: number,
-  ry: number,
-  startAngle: number,
-): Point[] {
-  return Array.from({ length: count }, (_, i) => {
-    const angle = ((startAngle + (360 / count) * i) * Math.PI) / 180;
-    return pt(PLOT_CX + rx * Math.cos(angle), PLOT_CY + ry * Math.sin(angle));
-  });
+function plotTangentDeg(u: number, v: number): number {
+  const a = plotPoint(Math.max(0, u - 0.02), v);
+  const b = plotPoint(Math.min(1, u + 0.02), v);
+  return (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
+}
+
+function dist(a: Point, b: Point) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function alongEdge(a: Point, b: Point, t: number): Point {
+  return pt(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t);
+}
+
+type Cell = { r: number; c: number; u: number; v: number; d: number };
+
+function bannerCells(): Cell[] {
+  const cols = 7;
+  const rows = 7;
+  const cells: Cell[] = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      cells.push({
+        r,
+        c,
+        u: (c + 0.5) / cols,
+        v: (r + 0.5) / rows,
+        d: Math.hypot(c - 3, r - 3),
+      });
+    }
+  }
+  cells.sort((a, b) => a.d - b.d || a.r - b.r || a.c - b.c);
+  return cells;
+}
+
+function bannerAt(
+  cell: Cell,
+  args: {
+    id: string;
+    tier: PlacementDefinition["tier"];
+    name: string;
+    notes: string;
+    minBidCents: number;
+    widthM: number;
+    heightM: number;
+    sizeFrac: number;
+  },
+): PlacementDefinition {
+  const center = plotPoint(cell.u, cell.v);
+  const east = plotPoint(Math.min(1, cell.u + 0.5 / 7), cell.v);
+  const south = plotPoint(cell.u, Math.min(1, cell.v + 0.5 / 7));
+  const w = dist(center, east) * 2 * args.sizeFrac;
+  const h = dist(center, south) * 2 * args.sizeFrac * 0.72;
+  return {
+    id: args.id,
+    type: "banner",
+    tier: args.tier,
+    name: args.name,
+    sizeLabel: `${args.widthM} × ${args.heightM} m`,
+    widthM: args.widthM,
+    heightM: args.heightM,
+    minBidCents: args.minBidCents,
+    locationNote: args.notes,
+    geometry: {
+      kind: "rect",
+      points: rotatedRect(
+        center.x,
+        center.y,
+        w,
+        h,
+        plotTangentDeg(cell.u, cell.v),
+      ),
+    },
+  };
+}
+
+function perimeterFlags(count: number): Point[] {
+  const corners = [PLOT.tl, PLOT.tr, PLOT.br, PLOT.bl, PLOT.tl].map((p) =>
+    pt(p.x, p.y),
+  );
+  const edges: Array<{ a: Point; b: Point; len: number }> = [];
+  for (let i = 0; i < 4; i++) {
+    const a = corners[i]!;
+    const b = corners[i + 1]!;
+    edges.push({ a, b, len: dist(a, b) });
+  }
+  const total = edges.reduce((s, e) => s + e.len, 0);
+  const points: Point[] = [];
+  const inset = 0.035;
+  const mid = plotPoint(0.5, 0.5);
+  for (let i = 0; i < count; i++) {
+    const t = ((i + 0.5) / count) * total;
+    let acc = 0;
+    for (const edge of edges) {
+      if (acc + edge.len >= t || edge === edges[edges.length - 1]) {
+        const local = (t - acc) / edge.len;
+        const p = alongEdge(edge.a, edge.b, Math.min(1, Math.max(0, local)));
+        points.push(
+          pt(p.x + (mid.x - p.x) * inset, p.y + (mid.y - p.y) * inset),
+        );
+        break;
+      }
+      acc += edge.len;
+    }
+  }
+  return points;
 }
 
 export function buildPlacementDefinitions(): PlacementDefinition[] {
-  const central: PlacementDefinition = {
+  const cells = bannerCells();
+  const centralCell = cells[0]!;
+  const largeCells = cells.slice(1, 7);
+  const mediumCells = cells.slice(7, 21);
+  const smallCells = cells.slice(21, 49);
+
+  const central = bannerAt(centralCell, {
     id: "B-C-01",
-    type: "banner",
     tier: "central",
     name: "Central field banner",
-    sizeLabel: "15 × 5 m",
+    notes:
+      "The dominant ground banner at the centre of the plot — the piece every overhead shot will find first.",
+    minBidCents: 2_500_000,
     widthM: 15,
     heightM: 5,
-    minBidCents: 2_500_000,
-    locationNote:
-      "The dominant ground banner at the centre of the plot — the piece every overhead shot will find first.",
-    geometry: {
-      kind: "rect",
-      points: rotatedRect(PLOT_CX, PLOT_CY, 13.2, 4.4, -4),
-    },
-  };
-
-  const large = ringBanners({
-    count: 6,
-    radius: 11.2,
-    w: 9.4,
-    h: 3.6,
-    prefix: "B-L",
-    tier: "large",
-    widthM: 10,
-    heightM: 4,
-    minBidCents: 350_000,
-    names: (i) => `Large ring banner ${pad(i)}`,
-    notes: (i) =>
-      `One of six large banners ringing the centre. Position ${pad(i)} sits in the inner composition belt.`,
+    sizeFrac: 0.92,
   });
 
-  const medium = ringBanners({
-    count: 14,
-    radius: 18.6,
-    w: 6.8,
-    h: 2.8,
-    prefix: "B-M",
-    tier: "medium",
-    widthM: 7,
-    heightM: 3,
-    minBidCents: 125_000,
-    startAngle: -78,
-    names: (i) => `Medium field banner ${pad(i)}`,
-    notes: (i) =>
-      `Second ring, position ${pad(i)}. Visible from the terrace edge and in mid-altitude drone passes.`,
-  });
+  const large = largeCells.map((cell, i) =>
+    bannerAt(cell, {
+      id: `B-L-${pad(i + 1)}`,
+      tier: "large",
+      name: `Large field banner ${pad(i + 1)}`,
+      notes: `Large banner ${pad(i + 1)} on the inner field grid, still close to the centre of the plot.`,
+      minBidCents: 350_000,
+      widthM: 10,
+      heightM: 4,
+      sizeFrac: 0.84,
+    }),
+  );
 
-  const small = ringBanners({
-    count: 28,
-    radius: 25.4,
-    w: 5.1,
-    h: 2.0,
-    prefix: "B-S",
-    tier: "small",
-    widthM: 5,
-    heightM: 2,
-    minBidCents: 60_000,
-    startAngle: -84,
-    names: (i) => `Small outer banner ${pad(i)}`,
-    notes: (i) =>
-      `Outer field position ${pad(i)}. Completes the composition along the plot’s working edge.`,
-  });
+  const medium = mediumCells.map((cell, i) =>
+    bannerAt(cell, {
+      id: `B-M-${pad(i + 1)}`,
+      tier: "medium",
+      name: `Medium field banner ${pad(i + 1)}`,
+      notes: `Medium banner ${pad(i + 1)} in the working grid between the centre and the plot edge.`,
+      minBidCents: 125_000,
+      widthM: 7,
+      heightM: 3,
+      sizeFrac: 0.8,
+    }),
+  );
+
+  const small = smallCells.map((cell, i) =>
+    bannerAt(cell, {
+      id: `B-S-${pad(i + 1)}`,
+      tier: "small",
+      name: `Small field banner ${pad(i + 1)}`,
+      notes: `Small banner ${pad(i + 1)} filling the remaining ground inside the white boundary.`,
+      minBidCents: 60_000,
+      widthM: 5,
+      heightM: 2,
+      sizeFrac: 0.76,
+    }),
+  );
 
   const landmarkNotes = [
-    "Northwest entrance — the first flag you meet coming off the access track.",
-    "Northeast ridge — catches the Atlantic light late in the afternoon.",
-    "Southeast corner — frames the valley drop toward São Vicente.",
-    "Southwest terrace — sits against the darker laurel edge.",
+    "Northwest corner — first flag off the access track.",
+    "Northeast corner — along the upper terrace edge.",
+    "Southeast corner — toward the neighbouring houses.",
+    "Southwest corner — where the plot meets the road.",
   ];
   const landmarkPoints: Point[] = [
-    pt(18.5, 18.5),
-    pt(76.5, 19.2),
-    pt(80.2, 66.4),
-    pt(17.8, 68.1),
+    plotPoint(0.06, 0.06),
+    plotPoint(0.94, 0.06),
+    plotPoint(0.94, 0.94),
+    plotPoint(0.06, 0.94),
   ];
   const landmark: PlacementDefinition[] = landmarkPoints.map((point, i) => ({
     id: `F-L-${pad(i + 1)}`,
@@ -179,19 +241,20 @@ export function buildPlacementDefinitions(): PlacementDefinition[] {
     geometry: { kind: "pin", point },
   }));
 
-  const perimeterPoints = ellipsePins(32, 33.5, 24.8, -90);
-  const perimeter: PlacementDefinition[] = perimeterPoints.map((point, i) => ({
-    id: `F-P-${pad(i + 1)}`,
-    type: "flag",
-    tier: "perimeter",
-    name: `Perimeter flag ${pad(i + 1)}`,
-    sizeLabel: "2.8 m high",
-    widthM: 0.9,
-    heightM: 2.8,
-    minBidCents: 50_000,
-    locationNote: `Boundary flag ${pad(i + 1)} of 32, distributed around the plot edge.`,
-    geometry: { kind: "pin", point },
-  }));
+  const perimeter: PlacementDefinition[] = perimeterFlags(32).map(
+    (point, i) => ({
+      id: `F-P-${pad(i + 1)}`,
+      type: "flag",
+      tier: "perimeter",
+      name: `Perimeter flag ${pad(i + 1)}`,
+      sizeLabel: "2.8 m high",
+      widthM: 0.9,
+      heightM: 2.8,
+      minBidCents: 50_000,
+      locationNote: `Boundary flag ${pad(i + 1)} of 32, standing on the white outline of the plot.`,
+      geometry: { kind: "pin", point },
+    }),
+  );
 
   const all = [
     central,
