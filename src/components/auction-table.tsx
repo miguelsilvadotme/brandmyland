@@ -164,7 +164,7 @@ export function AuctionTable({
                     className={cn(buttonVariants({ variant: expanded ? "outline" : "default" }), "h-10 px-5")}
                     onClick={() => setExpanded((v) => !v)}
                   >
-                    {expanded ? "Show less" : `Expand more · ${hiddenCount} spots`}
+                    {expanded ? "Show less" : "Expand more"}
                   </button>
                 </div>
               ) : null}
