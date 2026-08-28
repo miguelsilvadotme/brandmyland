@@ -6,7 +6,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 
 export type MapFilter =
@@ -25,7 +24,7 @@ export type MapFilter =
 export type MapView = "live" | "final";
 
 const FILTERS: { id: MapFilter; label: string }[] = [
-  { id: "all", label: "All spots" },
+  { id: "all", label: "All" },
   { id: "banners", label: "Banners" },
   { id: "flags", label: "Flags" },
   { id: "available", label: "Available" },
@@ -66,7 +65,7 @@ export function MapFilters({
           className="min-w-40 bg-card"
           aria-label="Placement filter"
         >
-          <SelectValue />
+          {FILTERS.find((item) => item.id === filter)?.label ?? "All"}
         </SelectTrigger>
         <SelectContent align="start" alignItemWithTrigger={false} className="min-w-40">
           {FILTERS.map((item) => (
