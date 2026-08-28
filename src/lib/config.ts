@@ -92,6 +92,26 @@ export function buildDefaultSettings(): AuctionSettings {
   };
 }
 
+export const LAND_LATITUDE = Number(env("NEXT_PUBLIC_LAND_LAT", "32.781712"));
+export const LAND_LONGITUDE = Number(env("NEXT_PUBLIC_LAND_LNG", "-17.044360"));
+
+export function landCoordinateLabel() {
+  return `${LAND_LATITUDE.toFixed(6)}, ${LAND_LONGITUDE.toFixed(6)}`;
+}
+
+export function googleEarthUrl() {
+  return `https://earth.google.com/web/@${LAND_LATITUDE},${LAND_LONGITUDE},480a,900d,35y,0h,55t,0r`;
+}
+
+export function googleMapsSatelliteUrl() {
+  return `https://www.google.com/maps/@${LAND_LATITUDE},${LAND_LONGITUDE},18z/data=!3m1!1e3`;
+}
+
+export function googleMapsEmbedUrl() {
+  const q = encodeURIComponent(`${LAND_LATITUDE},${LAND_LONGITUDE}`);
+  return `https://maps.google.com/maps?q=${q}&z=18&t=k&output=embed`;
+}
+
 export const DEFAULT_MILESTONES: Milestone[] = [
   {
     id: "min-inventory",

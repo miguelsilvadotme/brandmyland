@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { AuctionSettings } from "@/lib/types";
 import { format } from "date-fns";
+import { googleEarthUrl, landCoordinateLabel } from "@/lib/config";
 
 export function SiteFooter({ settings }: { settings: AuctionSettings }) {
   return (
@@ -9,6 +10,16 @@ export function SiteFooter({ settings }: { settings: AuctionSettings }) {
         <div>
           <p className="font-semibold">Brand My Land</p>
           <p className="mt-2 text-sm text-muted-foreground">São Vicente, Madeira, Portugal</p>
+          <p className="mt-1 text-sm">
+            <a
+              href={googleEarthUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono tabular-nums underline-offset-2 hover:underline"
+            >
+              {landCoordinateLabel()}
+            </a>
+          </p>
           <p className="mt-2 text-sm">
             {settings.statusLabel}
             {settings.mode !== "closed" ? (

@@ -6,6 +6,7 @@ import { formatDistanceToNowStrict } from "date-fns";
 import type { AuctionSettings, FaqItem, Milestone, PublicBid, PublicPlacement, AuctionMode, AdminSummary } from "@/lib/types";
 import { formatEuroFromCents } from "@/lib/auction/money";
 import { LandMap } from "@/components/land-map";
+import { LandLocation } from "@/components/land-location";
 import { PlacementDialog } from "@/components/placement-dialog";
 import { AuctionTable } from "@/components/auction-table";
 import { ActivityFeed } from "@/components/activity-feed";
@@ -20,6 +21,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { trackClientEvent } from "@/lib/analytics";
 import { toast } from "sonner";
+import { googleEarthUrl, landCoordinateLabel } from "@/lib/config";
 
 export type Catalog = {
   settings: AuctionSettings;
@@ -149,6 +151,17 @@ export function AuctionExperience({
               85 independently auctioned positions on one 1,300 m² plot. Server time is
               the authority. Auction window ends {formatUtc(catalog.settings.endAt)}.
             </p>
+            <p className="mt-1 text-sm">
+              <a
+                href={googleEarthUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono tabular-nums underline-offset-2 hover:underline"
+              >
+                {landCoordinateLabel()}
+              </a>
+              <span className="text-muted-foreground"> · Google Earth</span>
+            </p>
           </div>
         </div>
         <LandMap
@@ -158,6 +171,7 @@ export function AuctionExperience({
           demoLabel={catalog.settings.demoDataLabel}
           mode={catalog.settings.mode}
         />
+        <LandLocation />
         <AuctionTable placements={catalog.placements} bids={catalog.bids} onSelect={select} />
         <ActivityFeed items={catalog.activity} />
       </section>

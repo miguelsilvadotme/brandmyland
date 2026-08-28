@@ -1,5 +1,5 @@
 import type { AuctionSettings } from "@/lib/types";
-import { siteUrl } from "@/lib/config";
+import { siteUrl, LAND_LATITUDE, LAND_LONGITUDE } from "@/lib/config";
 
 export function JsonLd({ settings }: { settings: AuctionSettings }) {
   const data = {
@@ -14,6 +14,11 @@ export function JsonLd({ settings }: { settings: AuctionSettings }) {
     location: {
       "@type": "Place",
       name: "São Vicente, Madeira, Portugal",
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: LAND_LATITUDE,
+        longitude: LAND_LONGITUDE,
+      },
       address: {
         "@type": "PostalAddress",
         addressLocality: "São Vicente",
