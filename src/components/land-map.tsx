@@ -71,7 +71,7 @@ export function LandMap({
     <div className="flex flex-col gap-3">
       <MapFilters filter={filter} onFilter={setFilter} view={view} onView={setView} />
       <div
-        className="relative aspect-[1170/810] overflow-hidden rounded-2xl border border-border bg-[#2a3324] shadow-[0_20px_60px_-30px_rgba(17,18,15,0.45)]"
+        className={`relative overflow-hidden rounded-2xl border border-border bg-[#2a3324] shadow-[0_20px_60px_-30px_rgba(17,18,15,0.45)] ${view === "final" ? "aspect-[1672/940]" : "aspect-[1170/810]"}`}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
