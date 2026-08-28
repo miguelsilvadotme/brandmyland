@@ -1,6 +1,13 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export type MapFilter =
   | "all"
@@ -18,7 +25,7 @@ export type MapFilter =
 export type MapView = "live" | "final";
 
 const FILTERS: { id: MapFilter; label: string }[] = [
-  { id: "all", label: "All" },
+  { id: "all", label: "All spots" },
   { id: "banners", label: "Banners" },
   { id: "flags", label: "Flags" },
   { id: "available", label: "Available" },
@@ -43,25 +50,32 @@ export function MapFilters({
   onView: (v: MapView) => void;
 }) {
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap gap-1.5" role="group" aria-label="Placement filters">
-        {FILTERS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => onFilter(item.id)}
-            className={cn(
-              "rounded-full border px-3 py-1 text-xs",
-              filter === item.id
-                ? "border-foreground bg-foreground text-primary-foreground"
-                : "border-border bg-card hover:bg-muted",
-            )}
-            aria-pressed={filter === item.id}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
+    <div className="flex flex-wrap items-center gap-2">
+      <label className="sr-only" htmlFor="map-filter">
+        Placement filter
+      </label>
+      <Select
+        value={filter}
+        onValueChange={(value) => {
+          if (typeof value === "string") onFilter(value as MapFilter);
+        }}
+      >
+        <SelectTrigger
+          id="map-filter"
+          size="sm"
+          className="min-w-40 bg-card"
+          aria-label="Placement filter"
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent align="start" alignItemWithTrigger={false} className="min-w-40">
+          {FILTERS.map((item) => (
+            <SelectItem key={item.id} value={item.id}>
+              {item.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <div className="flex gap-1.5" role="group" aria-label="Map view">
         {(["live", "final"] as const).map((v) => (
           <button
