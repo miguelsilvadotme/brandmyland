@@ -47,7 +47,6 @@ Run `supabase/migrations/001_init.sql` in the SQL editor, then seed placements f
 ## Assets you should replace
 
 - `/public/images/land-aerial.jpg` — real Google Earth crop of the outlined plot (map)
-- `/public/images/land-earth.jpg` — wider Earth screenshot (location)
 - `/public/images/founder.jpg` — founder portrait
 - Legal entity, VAT, address, contact, policy version
 - Social URLs
