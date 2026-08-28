@@ -79,7 +79,16 @@ export function AuctionExperience({
         endAt={catalog.settings.endAt}
       />
 
-      <section id="the-land" className="mx-auto max-w-7xl scroll-mt-24 px-4 py-6">
+      <section
+        id="the-land"
+        className="mx-auto max-w-7xl scroll-mt-24 space-y-4 px-4 py-6"
+        aria-label="The land"
+      >
+        <LandLocation />
+        <LandPhotos />
+      </section>
+
+      <section id="marketplace" className="mx-auto max-w-7xl scroll-mt-24 px-4 py-6">
         <div className="mb-4">
           <h2 className="text-2xl font-semibold">The land is the marketplace</h2>
           <p className="text-sm text-muted-foreground">
@@ -93,8 +102,6 @@ export function AuctionExperience({
           onSelect={select}
           landImagePath={catalog.settings.landImagePath}
         />
-        <LandLocation />
-        <LandPhotos />
         <AuctionTable placements={catalog.placements} bids={catalog.bids} onSelect={select} />
         <ActivityFeed items={catalog.activity} />
       </section>

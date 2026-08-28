@@ -10,7 +10,7 @@ export function FinalCTA() {
         story—or the most ambitious field in Madeira.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
-        <a href="#the-land" className={cn(buttonVariants(), "h-11 px-6")}>
+        <a href="#marketplace" className={cn(buttonVariants(), "h-11 px-6")}>
           Choose your spot
         </a>
         <a href="#auction" className={cn(buttonVariants({ variant: "outline" }), "h-11 px-6")}>

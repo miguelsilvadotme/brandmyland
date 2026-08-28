@@ -17,7 +17,7 @@ const PHOTOS = [
 
 export function LandPhotos() {
   return (
-    <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-card">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card">
       <div className="space-y-3 px-4 py-4 text-sm leading-relaxed text-muted-foreground md:px-5">
         <p className="text-foreground">
           This is not a scam. The land is mine. I kept this page as simple as possible so

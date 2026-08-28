@@ -90,7 +90,7 @@ export function HeroBanner({
       </div>
 
       <div className="mt-8 flex flex-wrap justify-center gap-3">
-        <a href="#the-land" className={cn(buttonVariants(), "h-11 px-5")}>
+        <a href="#marketplace" className={cn(buttonVariants(), "h-11 px-5")}>
           Choose a spot
         </a>
         <a href="#how-it-works" className={cn(buttonVariants({ variant: "outline" }), "h-11 px-5")}>

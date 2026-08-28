@@ -43,7 +43,7 @@ export function SiteHeader({ settings }: { settings: AuctionSettings }) {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <a href="#the-land" className={buttonVariants()}>
+          <a href="#marketplace" className={buttonVariants()}>
             Choose your spot
           </a>
           <Sheet>

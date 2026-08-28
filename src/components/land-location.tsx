@@ -4,11 +4,11 @@ export function LandLocation() {
   const coords = landCoordinateLabel();
   const earth = googleEarthUrl();
   return (
-    <aside className="mt-4 overflow-hidden rounded-2xl border border-border bg-card">
+    <aside className="overflow-hidden rounded-2xl border border-border bg-card">
       <iframe
         title="Satellite view of the Brand My Land plot in São Vicente, Madeira"
         src={googleMapsEmbedUrl()}
-        className="h-52 w-full border-0 md:h-64"
+        className="h-64 w-full border-0 md:h-[22rem]"
         loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"
       />
